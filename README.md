@@ -25,7 +25,8 @@ Clinical tremor assessments often rely on brief, subjective in-clinic observatio
 ---
 
 ## Live Demo & Preview
-* **Interactive Web Interface:** [Insert your GitHub Pages / Netlify link here]
+* **Interactive Web Interface:** (https://github.com/Tingting71/TremorCare/blob/main/tremor-monitor-v3%20(2).html)
+* https://github.com/Tingting71/TremorCare/blob/main/tremor-app-v2.html
 * *(Tip: Add 1–2 screenshots of your hardware prototype and dashboard UI in an `assets/` folder and link them here.)*
 
 ---
