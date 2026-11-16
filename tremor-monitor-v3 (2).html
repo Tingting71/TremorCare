@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>TremorCare</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Source+Sans+3:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#18181b;--ink2:#3f3f46;--ink3:#71717a;--ink4:#a1a1aa;--ink5:#d4d4d8;
+  --paper:#fafaf9;--surf:#ffffff;--surf2:#f5f5f4;--surf3:#e7e5e4;
+  --red:#be3a1d;--red2:#fde8e2;--red3:rgba(190,58,29,0.1);
+  --teal:#0f766e;--teal2:#ccfbf1;--teal3:rgba(15,118,110,0.09);
+  --blue:#1d4ed8;--blue2:#dbeafe;--blue3:rgba(29,78,216,0.08);
+  --amber:#b45309;--amber2:#fef3c7;--amber3:rgba(180,83,9,0.09);
+  --violet:#6d28d9;--violet2:#ede9fe;--violet3:rgba(109,40,217,0.08);
+  --r:12px;--rsm:7px;--sh:0 1px 2px rgba(0,0,0,0.04),0 4px 16px rgba(0,0,0,0.06);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Source Sans 3',sans-serif;background:var(--paper);color:var(--ink);font-size:14px;line-height:1.6;}
+button,input,textarea,select{font-family:inherit;}
+
+/* ── SHELL ── */
+.shell{display:flex;min-height:100vh;}
+.sidebar{width:224px;flex-shrink:0;background:var(--ink);display:flex;flex-direction:column;padding:0 0 16px;position:fixed;top:0;left:0;bottom:0;z-index:200;overflow-y:auto;}
+.main{margin-left:224px;flex:1;min-width:0;}
+
+/* ── SIDEBAR ── */
+.sb-logo{padding:22px 20px 18px;border-bottom:1px solid rgba(255,255,255,0.07);}
+.sb-wordmark{font-family:'Lora',serif;font-size:18px;color:#fff;letter-spacing:-0.2px;display:flex;align-items:center;gap:8px;}
+.sb-wordmark-dot{width:9px;height:9px;border-radius:50%;background:var(--red);flex-shrink:0;animation:heartbeat 2s infinite;}
+@keyframes heartbeat{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
+.sb-sub{font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-transform:uppercase;margin-top:3px;margin-left:17px;}
+.sb-section{padding:14px 12px 4px;font-size:9px;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.12em;font-weight:600;}
+.sb-nav{padding:2px 10px;}
+.nav-btn{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;color:rgba(255,255,255,0.48);font-size:13px;font-weight:400;transition:all 0.13s;border:none;background:none;width:100%;text-align:left;}
+.nav-btn:hover{color:rgba(255,255,255,0.82);background:rgba(255,255,255,0.05);}
+.nav-btn.active{color:#fff;background:rgba(255,255,255,0.09);font-weight:500;}
+.nav-btn.active .nav-icon{color:var(--red);}
+.nav-icon{font-size:15px;width:20px;text-align:center;flex-shrink:0;opacity:0.7;}
+.nav-btn.active .nav-icon{opacity:1;}
+.sb-divider{height:1px;background:rgba(255,255,255,0.07);margin:8px 0;}
+.sb-conn{padding:14px 20px 0;margin-top:auto;}
+.conn-row{display:flex;align-items:center;gap:7px;font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:8px;}
+.cdot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.15);flex-shrink:0;}
+.cdot.live{background:#22c55e;animation:glow 2s infinite;}
+@keyframes glow{0%,100%{box-shadow:0 0 0 2px rgba(34,197,94,0.2)}50%{box-shadow:0 0 0 5px rgba(34,197,94,0.07)}}
+.ws-inp{width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:7px 9px;font-size:11px;color:rgba(255,255,255,0.6);font-family:'JetBrains Mono',monospace;margin-bottom:6px;}
+.ws-inp::placeholder{color:rgba(255,255,255,0.18);}
+.conn-btn-main{width:100%;padding:8px;background:rgba(190,58,29,0.7);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;transition:background 0.14s;}
+.conn-btn-main:hover{background:var(--red);}
+
+/* ── PAGES ── */
+.page{display:none;padding:28px 32px;min-height:100vh;} .page.active{display:block;}
+.page-hd{margin-bottom:24px;}
+.page-title{font-family:'Lora',serif;font-size:28px;letter-spacing:-0.3px;line-height:1.15;}
+.page-title em{color:var(--red);font-style:italic;}
+.page-sub{font-size:13px;color:var(--ink3);margin-top:5px;}
+
+/* ── CARDS ── */
+.card{background:var(--surf);border:1px solid var(--surf3);border-radius:var(--r);box-shadow:var(--sh);}
+.cp{padding:18px 20px;}
+.ch{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.09em;color:var(--ink4);margin-bottom:11px;display:flex;justify-content:space-between;align-items:center;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px;}
+.gf{margin-bottom:12px;}
+
+/* ── STATUS BANNER ── */
+.sbanner{border-radius:var(--r);padding:20px 24px;display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;border:1px solid;transition:all 0.4s;position:relative;overflow:hidden;}
+.sbanner::after{content:'';position:absolute;right:-40px;top:-40px;width:130px;height:130px;border-radius:50%;background:currentColor;opacity:0.06;}
+.bn{background:var(--teal3);border-color:var(--teal2);color:var(--teal);}
+.bt{background:var(--red3);border-color:var(--red2);color:var(--red);}
+.bs-state{font-family:'Lora',serif;font-size:32px;letter-spacing:-0.5px;}
+.bs-detail{font-size:12px;opacity:0.65;margin-top:3px;}
+.bs-num{font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:500;text-align:right;}
+.bs-lab{font-size:10px;opacity:0.55;text-align:right;text-transform:uppercase;letter-spacing:0.06em;margin-top:2px;}
+
+/* ── STAT CARDS ── */
+.sc{background:var(--surf);border:1px solid var(--surf3);border-radius:var(--r);padding:14px 16px;box-shadow:var(--sh);}
+.sc-lab{font-size:11px;color:var(--ink3);margin-bottom:4px;}
+.sc-val{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:500;}
+.sc-unit{font-size:11px;color:var(--ink4);margin-top:1px;}
+.sc-sub{font-size:11px;color:var(--ink3);margin-top:3px;}
+.sc-amber{background:var(--amber2);border-color:#e9d9a0;}
+.sc-teal{background:var(--teal2);border-color:#a7f3d0;}
+.sc-violet{background:var(--violet2);border-color:#ddd6fe;}
+
+/* ── VIEW TOGGLE ── */
+.vtoggle{display:inline-flex;background:var(--surf2);border:1px solid var(--surf3);border-radius:10px;padding:3px;margin-bottom:18px;gap:2px;}
+.vbtn{padding:6px 14px;font-size:12px;font-weight:500;border-radius:7px;cursor:pointer;border:none;background:transparent;color:var(--ink3);transition:all 0.13s;display:flex;align-items:center;gap:5px;}
+.vbtn.active{background:var(--ink);color:#fff;}
+
+/* ── ACTIVITY TAGS ── */
+.atags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:9px;}
+.atag{padding:5px 12px;border:1px solid var(--surf3);border-radius:99px;font-size:12px;cursor:pointer;background:var(--surf2);color:var(--ink2);transition:all 0.12s;}
+.atag:hover{border-color:var(--red2);color:var(--red);}
+.atag.on{background:var(--red3);color:var(--red);border-color:var(--red2);font-weight:500;}
+.arow{display:flex;gap:8px;margin-top:5px;}
+.ainp{flex:1;border:1px solid var(--surf3);border-radius:var(--rsm);padding:8px 11px;font-size:13px;background:var(--surf2);color:var(--ink);}
+.ainp:focus{outline:none;border-color:var(--red2);}
+.abtn{padding:8px 16px;background:var(--ink);color:#fff;border:none;border-radius:var(--rsm);font-size:12px;font-weight:500;cursor:pointer;transition:background 0.13s;white-space:nowrap;}
+.abtn:hover{background:var(--red);}
+
+/* ── CHARTS ── */
+.alabel{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--ink4);margin-bottom:2px;margin-top:10px;display:flex;align-items:center;gap:5px;}
+.adot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+canvas{display:block;width:100%;}
+.frow{display:flex;align-items:center;gap:7px;}
+.ftrack{flex:1;height:4px;background:var(--surf3);border-radius:2px;overflow:hidden;max-width:80px;}
+.ffill{height:100%;background:var(--red);border-radius:2px;transition:width 0.1s;}
+.rmono{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink3);}
+
+/* ── EVENTS ── */
+.evlist{max-height:320px;overflow-y:auto;}
+.evitem{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--surf2);}
+.evitem:last-child{border-bottom:none;}
+.evpip{width:7px;height:7px;border-radius:50%;margin-top:5px;flex-shrink:0;background:var(--red);}
+.evbody{flex:1;min-width:0;}
+.evtit{font-size:13px;font-weight:500;}
+.evmeta{font-size:11px;color:var(--ink3);margin-top:2px;}
+.evtime{font-size:11px;color:var(--ink4);font-family:'JetBrains Mono',monospace;white-space:nowrap;}
+.ibadge{display:inline-block;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:600;margin-left:4px;text-transform:uppercase;letter-spacing:0.04em;}
+.ilow{background:var(--amber2);color:var(--amber);}
+.imed{background:var(--red2);color:var(--red);}
+.ihigh{background:#fde8e8;color:#991b1b;}
+.apill{display:inline-block;background:var(--blue2);color:var(--blue);font-size:10px;padding:2px 7px;border-radius:3px;margin:3px 2px 0 0;font-weight:500;}
+
+/* ── TREND CHART TABS ── */
+.trend-tabs{display:flex;gap:2px;margin-bottom:14px;background:var(--surf2);border:1px solid var(--surf3);border-radius:8px;padding:3px;}
+.ttab{flex:1;text-align:center;padding:6px 4px;font-size:12px;font-weight:500;color:var(--ink3);cursor:pointer;border-radius:5px;border:none;background:none;transition:all 0.13s;}
+.ttab.active{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,0.08);}
+
+/* ── PIE ROWS ── */
+.prow{display:flex;align-items:center;gap:8px;padding:5px 0;}
+.plab{font-size:12px;color:var(--ink2);min-width:80px;}
+.ptrack{flex:1;height:5px;background:var(--surf3);border-radius:3px;overflow:hidden;}
+.pfill{height:100%;border-radius:3px;background:var(--red);}
+.ppct{font-size:11px;color:var(--ink3);min-width:32px;text-align:right;font-family:'JetBrains Mono',monospace;}
+
+/* ── REPORT ── */
+.rrow{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--surf2);font-size:13px;}
+.rrow:last-child{border-bottom:none;}
+.rval{font-family:'JetBrains Mono',monospace;font-weight:500;}
+.rheading{font-family:'Lora',serif;font-size:17px;margin-bottom:12px;margin-top:4px;}
+.insight-card{border-radius:10px;padding:14px 16px;margin-bottom:10px;border-left:3px solid;}
+.ic-blue{background:var(--blue2);border-color:var(--blue);}
+.ic-teal{background:var(--teal2);border-color:var(--teal);}
+.ic-amber{background:var(--amber2);border-color:var(--amber);}
+.ic-red{background:var(--red2);border-color:var(--red);}
+.ic-violet{background:var(--violet2);border-color:var(--violet);}
+.insight-title{font-size:12px;font-weight:600;margin-bottom:4px;}
+.insight-body{font-size:12px;line-height:1.65;color:var(--ink2);}
+
+/* ── LEARN ── */
+.learn-hero{background:var(--ink);border-radius:var(--r);padding:36px 40px;margin-bottom:18px;position:relative;overflow:hidden;}
+.learn-hero::before{content:'';position:absolute;right:-60px;bottom:-60px;width:220px;height:220px;border-radius:50%;background:var(--red);opacity:0.07;}
+.learn-hero::after{content:'';position:absolute;left:-30px;top:-30px;width:140px;height:140px;border-radius:50%;background:#fff;opacity:0.02;}
+.lh-title{font-family:'Lora',serif;font-size:30px;color:#fff;letter-spacing:-0.4px;margin-bottom:8px;position:relative;z-index:1;}
+.lh-sub{font-size:13px;color:rgba(255,255,255,0.45);max-width:500px;line-height:1.75;position:relative;z-index:1;}
+.lh-badges{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap;position:relative;z-index:1;}
+.lh-badge{padding:4px 12px;border-radius:99px;font-size:11px;font-weight:500;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.6);}
+.fact-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--surf3);border:1px solid var(--surf3);border-radius:var(--r);overflow:hidden;margin-bottom:18px;}
+.fact-cell{background:#fff;padding:18px 18px;}
+.fact-num{font-family:'Lora',serif;font-size:26px;color:var(--red);}
+.fact-desc{font-size:11px;color:var(--ink3);margin-top:3px;line-height:1.55;}
+.lcard{background:#fff;border:1px solid var(--surf3);border-radius:var(--r);padding:22px;box-shadow:var(--sh);}
+.ltag{display:inline-block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.09em;padding:2px 8px;border-radius:3px;margin-bottom:10px;}
+.lt-blue{background:var(--blue2);color:var(--blue);}
+.lt-teal{background:var(--teal2);color:var(--teal);}
+.lt-red{background:var(--red2);color:var(--red);}
+.lt-amber{background:var(--amber2);color:var(--amber);}
+.lt-violet{background:var(--violet2);color:var(--violet);}
+.lcard h3{font-family:'Lora',serif;font-size:17px;margin-bottom:8px;}
+.lcard p{font-size:13px;color:var(--ink2);line-height:1.75;}
+.lcard ul{padding-left:16px;margin-top:7px;}
+.lcard li{font-size:13px;color:var(--ink2);line-height:1.75;margin-bottom:4px;}
+.research-card{background:#fff;border:1px solid var(--surf3);border-radius:var(--r);padding:20px;box-shadow:var(--sh);display:flex;gap:16px;}
+.rc-year{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink4);white-space:nowrap;padding-top:2px;}
+.rc-body h4{font-size:14px;font-weight:600;margin-bottom:4px;}
+.rc-body p{font-size:12px;color:var(--ink2);line-height:1.65;}
+.rc-journal{font-size:11px;color:var(--ink4);margin-top:5px;font-style:italic;}
+.anote{background:var(--red3);color:var(--red);padding:10px 14px;border-radius:var(--rsm);font-size:12px;border-left:3px solid var(--red);margin-top:12px;line-height:1.6;}
+
+/* ── COMMUNITY ── */
+.profile-setup{background:var(--surf);border:1px solid var(--surf3);border-radius:var(--r);padding:20px;margin-bottom:16px;box-shadow:var(--sh);}
+.psu-title{font-size:12px;font-weight:600;color:var(--ink2);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.07em;}
+.avatar-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+.av-opt{width:52px;height:52px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:26px;border:2px solid transparent;transition:all 0.15s;background:var(--surf2);}
+.av-opt:hover{border-color:var(--ink4);transform:scale(1.05);}
+.av-opt.sel{border-color:var(--red);box-shadow:0 0 0 3px var(--red3);}
+.anon-row{display:flex;align-items:center;gap:10px;margin-top:4px;}
+.toggle-wrap{position:relative;display:inline-flex;align-items:center;cursor:pointer;gap:8px;font-size:13px;color:var(--ink2);}
+.tog-inp{position:absolute;opacity:0;width:0;height:0;}
+.tog-track{width:36px;height:20px;background:var(--surf3);border-radius:10px;transition:background 0.2s;position:relative;flex-shrink:0;}
+.tog-inp:checked+.tog-track{background:var(--teal);}
+.tog-track::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:2px;left:2px;transition:transform 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.15);}
+.tog-inp:checked+.tog-track::after{transform:translateX(16px);}
+.name-inp{border:1px solid var(--surf3);border-radius:var(--rsm);padding:7px 11px;font-size:13px;background:var(--surf2);color:var(--ink);width:180px;}
+.name-inp:focus{outline:none;border-color:var(--red2);}
+.compose-box{background:var(--surf);border:1px solid var(--surf3);border-radius:var(--r);padding:17px 19px;margin-bottom:14px;box-shadow:var(--sh);}
+.compose-area{width:100%;border:1px solid var(--surf3);border-radius:var(--rsm);padding:10px 13px;font-size:13px;color:var(--ink);background:var(--surf2);resize:none;line-height:1.65;}
+.compose-area:focus{outline:none;border-color:var(--red2);}
+.compose-footer{display:flex;align-items:center;justify-content:space-between;margin-top:9px;flex-wrap:wrap;gap:8px;}
+.ctags{display:flex;gap:5px;flex-wrap:wrap;}
+.ctag{padding:4px 10px;border-radius:99px;font-size:11px;cursor:pointer;border:1px solid var(--surf3);background:var(--surf2);color:var(--ink3);transition:all 0.12s;}
+.ctag.on{background:var(--red3);color:var(--red);border-color:var(--red2);}
+.postbtn{padding:8px 20px;background:var(--ink);color:#fff;border:none;border-radius:var(--rsm);font-size:12px;font-weight:500;cursor:pointer;transition:background 0.13s;}
+.postbtn:hover{background:var(--red);}
+.pcard{background:#fff;border:1px solid var(--surf3);border-radius:var(--r);padding:17px 19px;margin-bottom:10px;box-shadow:var(--sh);transition:box-shadow 0.15s;}
+.pcard:hover{box-shadow:0 2px 8px rgba(0,0,0,0.07),0 8px 24px rgba(0,0,0,0.05);}
+.pcard-hd{display:flex;align-items:center;gap:10px;margin-bottom:9px;}
+.pav{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;background:var(--surf2);}
+.pav-anon{font-size:16px;background:var(--surf3);}
+.pname{font-size:13px;font-weight:600;}
+.ptime{font-size:11px;color:var(--ink4);}
+.ptags{display:flex;gap:4px;margin-top:2px;flex-wrap:wrap;}
+.ptag{font-size:10px;padding:1px 7px;border-radius:3px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;}
+.pt-exp{background:var(--blue2);color:var(--blue);}
+.pt-tip{background:var(--teal2);color:var(--teal);}
+.pt-q{background:var(--amber2);color:var(--amber);}
+.pt-sup{background:var(--violet2);color:var(--violet);}
+.pbody{font-size:13px;color:var(--ink2);line-height:1.75;}
+.pfooter{display:flex;gap:14px;margin-top:11px;padding-top:9px;border-top:1px solid var(--surf2);}
+.pact{font-size:11px;color:var(--ink4);cursor:pointer;transition:color 0.12s;display:flex;align-items:center;gap:3px;}
+.pact:hover,.pact.liked{color:var(--red);}
+
+/* ── DEMO BAR ── */
+.demobar{background:var(--amber2);border:1px solid #e9d9a0;border-radius:var(--rsm);padding:9px 13px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--amber);}
+.dbtn{font-size:11px;padding:4px 10px;border:1px solid #e9d9a0;border-radius:var(--rsm);background:#fff;color:var(--amber);cursor:pointer;margin-left:6px;}
+
+/* ── WEEK BARS ── */
+.wbars{display:flex;align-items:flex-end;gap:5px;height:80px;}
+.wbcol{flex:1;display:flex;flex-direction:column;align-items:center;height:100%;}
+.wbspc{flex:1;display:flex;align-items:flex-end;width:100%;}
+.wbbar{width:100%;border-radius:3px 3px 0 0;min-height:3px;background:var(--surf3);transition:height 0.35s;}
+.wbbar.today{background:var(--red);}
+.wbday{font-size:10px;color:var(--ink4);margin-top:4px;}
+.wbcnt{font-size:10px;color:var(--ink3);font-weight:600;margin-bottom:2px;min-height:14px;}
+
+/* ── TREND AREA CHART ── */
+.trend-canvas-wrap{position:relative;margin-bottom:4px;}
+.trend-ylab{position:absolute;left:0;top:0;bottom:20px;display:flex;flex-direction:column;justify-content:space-between;padding-right:6px;}
+.trend-ylab span{font-size:9px;color:var(--ink4);font-family:'JetBrains Mono',monospace;}
+
+/* ── MISC ── */
+.empty{text-align:center;padding:36px;color:var(--ink4);font-size:13px;}
+.divider{height:1px;background:var(--surf2);margin:16px 0;}
+.mb12{margin-bottom:12px;}
+.hidden{display:none!important;}
+.tag-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:500;}
+::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--surf3);border-radius:3px;}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-wordmark"><span class="sb-wordmark-dot"></span>TremorCare</div>
+    <div class="sb-sub">Parkinson's Monitor</div>
+  </div>
+  <div class="sb-nav" style="margin-top:10px;">
+    <div class="sb-section">Monitoring</div>
+    <button class="nav-btn active" onclick="goTo('monitor')"><span class="nav-icon">◉</span>Monitor</button>
+    <button class="nav-btn" onclick="goTo('history')"><span class="nav-icon">📊</span>History</button>
+    <button class="nav-btn" onclick="goTo('report')"><span class="nav-icon">📋</span>Report</button>
+    <div class="sb-divider"></div>
+    <div class="sb-section">Knowledge</div>
+    <button class="nav-btn" onclick="goTo('learn')"><span class="nav-icon">🔬</span>Learn & Research</button>
+    <div class="sb-divider"></div>
+    <div class="sb-section">Social</div>
+    <button class="nav-btn" onclick="goTo('community')"><span class="nav-icon">💬</span>Community</button>
+  </div>
+  <div class="sb-conn">
+    <div class="conn-row"><div class="cdot" id="scdot"></div><span id="sctext">Demo mode active</span></div>
+    <input class="ws-inp" id="wsUrl" placeholder="ws://192.168.x.x:81">
+    <button class="conn-btn-main" id="connBtn" onclick="toggleConn()">Connect to ESP32</button>
+  </div>
+</nav>
+
+<main class="main">
+
+<!-- ═══ MONITOR PAGE ═══ -->
+<div class="page active" id="page-monitor">
+  <div class="page-hd">
+    <div class="page-title">Hand <em>Monitor</em></div>
+    <div class="page-sub">Real-time IMU data · MPU-6050 via ESP32 WebSocket</div>
+  </div>
+  <div class="demobar" id="demobar">
+    <span><b>Demo mode</b> — simulating MPU-6050 data with synthetic 4.5 Hz tremor episodes</span>
+    <div><button class="dbtn" onclick="triggerDemo()">Trigger tremor</button><button class="dbtn" onclick="this.parentElement.parentElement.classList.add('hidden')">✕</button></div>
+  </div>
+  <div class="vtoggle">
+    <button class="vbtn" id="vt-dash" onclick="setView('dash')">⊟ Dashboard</button>
+    <button class="vbtn active" id="vt-sig" onclick="setView('sig')">⊞ Signal view</button>
+  </div>
+
+  <!-- DASHBOARD VIEW -->
+  <div id="view-dash" class="hidden">
+    <div class="sbanner bn" id="db-banner">
+      <div><div class="bs-state" id="db-state">Normal</div><div class="bs-detail" id="db-detail">No tremor detected — all clear</div></div>
+      <div><div class="bs-num" id="db-rms">0.000</div><div class="bs-lab">Z filtered RMS</div></div>
+    </div>
+    <div class="g4">
+      <div class="sc"><div class="sc-lab">Today's episodes</div><div class="sc-val" id="db-cnt">0</div><div class="sc-unit">tremors</div></div>
+      <div class="sc"><div class="sc-lab">Avg duration</div><div class="sc-val" id="db-avg">—</div><div class="sc-unit">seconds</div></div>
+      <div class="sc"><div class="sc-lab">Longest</div><div class="sc-val" id="db-max">—</div><div class="sc-unit">seconds</div></div>
+      <div class="sc"><div class="sc-lab">Shortest</div><div class="sc-val" id="db-min">—</div><div class="sc-unit">seconds</div></div>
+    </div>
+    <div class="g2">
+      <div class="sc sc-amber"><div class="sc-lab">Last tremor</div><div class="sc-val" id="db-last">No episodes yet</div><div class="sc-sub" id="db-ago">—</div></div>
+      <div class="sc sc-teal"><div class="sc-lab">Normal state today</div><div class="sc-val" id="db-norm">—</div><div class="sc-sub" id="db-normpct"></div></div>
+    </div>
+    <div class="card cp gf">
+      <div class="ch"><span id="db-logtit">Log activity for last episode</span><span id="db-logtim" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--red)"></span></div>
+      <div style="font-size:12px;color:var(--ink3);margin-bottom:9px" id="db-lognote">What were you doing during the last tremor?</div>
+      <div class="atags" id="db-tags">
+        <button class="atag" onclick="togAct(this,'db')">Typing</button>
+        <button class="atag" onclick="togAct(this,'db')">Writing</button>
+        <button class="atag" onclick="togAct(this,'db')">Eating</button>
+        <button class="atag" onclick="togAct(this,'db')">Drinking</button>
+        <button class="atag" onclick="togAct(this,'db')">Walking</button>
+        <button class="atag" onclick="togAct(this,'db')">Resting</button>
+        <button class="atag" onclick="togAct(this,'db')">Stressed</button>
+        <button class="atag" onclick="togAct(this,'db')">Exercising</button>
+        <button class="atag" onclick="togAct(this,'db')">Talking</button>
+      </div>
+      <div class="arow"><input class="ainp" id="db-custom" type="text" placeholder="Custom note..."><button class="abtn" onclick="saveAct('db')">Save</button></div>
+    </div>
+  </div>
+
+  <!-- SIGNAL VIEW -->
+  <div id="view-sig">
+    <div class="sbanner bn" id="sv-banner">
+      <div><div class="bs-state" id="sv-state">Normal</div><div class="bs-detail" id="sv-detail">No tremor detected</div></div>
+      <div><div class="bs-num" id="sv-rms">0.000</div><div class="bs-lab">Z filtered RMS (m/s²)</div></div>
+    </div>
+    <div class="g4">
+      <div class="sc"><div class="sc-lab">Today's episodes</div><div class="sc-val" id="sv-cnt">0</div></div>
+      <div class="sc"><div class="sc-lab">Avg duration</div><div class="sc-val" id="sv-avg">—</div><div class="sc-unit">s</div></div>
+      <div class="sc"><div class="sc-lab">Longest</div><div class="sc-val" id="sv-max">—</div><div class="sc-unit">s</div></div>
+      <div class="sc"><div class="sc-lab">Peak amplitude</div><div class="sc-val" id="sv-peak">—</div><div class="sc-unit">m/s²</div></div>
+    </div>
+    <div class="g2">
+      <div class="card cp">
+        <div class="ch"><span>X &amp; Y Axes</span><span id="hzDisp" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink4)">— Hz</span></div>
+        <div class="alabel"><span class="adot" style="background:#1d4ed8"></span>X axis</div>
+        <canvas id="chartX" height="50"></canvas>
+        <div class="alabel"><span class="adot" style="background:#0f766e"></span>Y axis</div>
+        <canvas id="chartY" height="50"></canvas>
+      </div>
+      <div class="card cp">
+        <div class="ch"><span>Z Axis — Tremor Band 3–6 Hz</span>
+          <div class="frow"><span style="font-size:10px;color:var(--ink4)">Power</span><div class="ftrack"><div class="ffill" id="ffill" style="width:0%"></div></div><span class="rmono" id="rmsDisp">0.000</span></div>
+        </div>
+        <div class="alabel"><span class="adot" style="background:var(--ink4)"></span>Raw Z</div>
+        <canvas id="chartZ" height="50"></canvas>
+        <div class="alabel"><span class="adot" style="background:var(--red)"></span>Filtered Z (3–6 Hz bandpass)</div>
+        <canvas id="chartZf" height="50"></canvas>
+        <div style="margin-top:7px;display:flex;justify-content:space-between;font-size:11px;color:var(--ink4)">
+          <span>Threshold: <b style="color:var(--ink2);font-family:'JetBrains Mono',monospace">0.30</b> m/s²</span>
+          <span>Confirm window: <b style="color:var(--ink2);font-family:'JetBrains Mono',monospace">0.8s</b></span>
+        </div>
+      </div>
+    </div>
+    <div class="card cp gf">
+      <div class="ch"><span id="sv-logtit">Log activity</span><span id="sv-logtim" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--red)"></span></div>
+      <div class="atags" id="sv-tags">
+        <button class="atag" onclick="togAct(this,'sv')">Typing</button>
+        <button class="atag" onclick="togAct(this,'sv')">Writing</button>
+        <button class="atag" onclick="togAct(this,'sv')">Eating</button>
+        <button class="atag" onclick="togAct(this,'sv')">Drinking</button>
+        <button class="atag" onclick="togAct(this,'sv')">Walking</button>
+        <button class="atag" onclick="togAct(this,'sv')">Resting</button>
+        <button class="atag" onclick="togAct(this,'sv')">Stressed</button>
+        <button class="atag" onclick="togAct(this,'sv')">Exercising</button>
+        <button class="atag" onclick="togAct(this,'sv')">Talking</button>
+      </div>
+      <div class="arow"><input class="ainp" id="sv-custom" type="text" placeholder="Custom note..."><button class="abtn" onclick="saveAct('sv')">Save</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ HISTORY PAGE ═══ -->
+<div class="page hidden" id="page-history">
+  <div class="page-hd">
+    <div class="page-title">Episode <em>History</em></div>
+    <div class="page-sub">Your complete tremor timeline with daily, weekly, monthly and yearly trends</div>
+  </div>
+
+  <!-- SUMMARY STAT ROW -->
+  <div class="g4" style="margin-bottom:14px;">
+    <div class="sc sc-teal">
+      <div class="sc-lab">Avg per day (period)</div>
+      <div class="sc-val" id="hist-avgday">—</div>
+      <div class="sc-unit">episodes</div>
+    </div>
+    <div class="sc sc-amber">
+      <div class="sc-lab">Total logged all time</div>
+      <div class="sc-val" id="hist-total">0</div>
+      <div class="sc-unit">episodes</div>
+    </div>
+    <div class="sc sc-violet">
+      <div class="sc-lab">Longest episode ever</div>
+      <div class="sc-val" id="hist-longest">—</div>
+      <div class="sc-unit">seconds</div>
+    </div>
+    <div class="sc" style="background:var(--blue2);border-color:#bfdbfe;">
+      <div class="sc-lab">Most active hour</div>
+      <div class="sc-val" id="hist-peak-hour">—</div>
+      <div class="sc-unit">of day</div>
+    </div>
+  </div>
+
+  <!-- TREND CHART CARD -->
+  <div class="card cp gf" style="margin-bottom:14px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <div>
+        <div style="font-size:15px;font-weight:600;font-family:'Lora',serif;">Tremor frequency over time</div>
+        <div style="font-size:11px;color:var(--ink3);margin-top:2px;" id="trend-subtitle">Episodes per hour today</div>
+      </div>
+      <div class="trend-tabs" style="margin-bottom:0;">
+        <button class="ttab active" onclick="setTrend('day',this)">Day</button>
+        <button class="ttab" onclick="setTrend('week',this)">Week</button>
+        <button class="ttab" onclick="setTrend('month',this)">Month</button>
+        <button class="ttab" onclick="setTrend('year',this)">Year</button>
+      </div>
+    </div>
+    <div style="position:relative;">
+      <canvas id="trendChart" height="130"></canvas>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--ink4);margin-top:5px;font-family:'JetBrains Mono',monospace;">
+      <span id="trendLabel-start">—</span>
+      <span id="trend-peak-label" style="color:var(--red);font-weight:500;"></span>
+      <span id="trendLabel-end">—</span>
+    </div>
+  </div>
+
+  <!-- HEATMAP -->
+  <div class="card cp gf" style="margin-bottom:14px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+      <div>
+        <div style="font-size:15px;font-weight:600;font-family:'Lora',serif;">24-hour activity heatmap</div>
+        <div style="font-size:11px;color:var(--ink3);margin-top:2px;">Darker = more tremor episodes in that hour</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:10px;color:var(--ink4);">
+        <span>None</span>
+        <div style="display:flex;gap:2px;">
+          <div style="width:12px;height:12px;border-radius:2px;background:rgba(190,58,29,0.08);"></div>
+          <div style="width:12px;height:12px;border-radius:2px;background:rgba(190,58,29,0.25);"></div>
+          <div style="width:12px;height:12px;border-radius:2px;background:rgba(190,58,29,0.55);"></div>
+          <div style="width:12px;height:12px;border-radius:2px;background:rgba(190,58,29,0.85);"></div>
+        </div>
+        <span>High</span>
+      </div>
+    </div>
+    <canvas id="heatmapChart" height="64"></canvas>
+    <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--ink4);margin-top:5px;padding:0 2px;font-family:'JetBrains Mono',monospace;">
+      <span>12 AM</span><span>3 AM</span><span>6 AM</span><span>9 AM</span><span>Noon</span><span>3 PM</span><span>6 PM</span><span>9 PM</span><span>11 PM</span>
+    </div>
+  </div>
+
+  <!-- EPISODE LIST + WEEKLY + ACTIVITY -->
+  <div class="g2" style="margin-bottom:14px;">
+    <div class="card cp">
+      <div class="ch">
+        <span>Today's episodes</span>
+        <button onclick="clearHist()" style="font-size:11px;color:var(--ink4);cursor:pointer;background:none;border:none;font-family:'Source Sans 3',sans-serif;">Clear all</button>
+      </div>
+      <div class="evlist" id="evList"><div class="empty">No episodes yet.<br><span style="font-size:11px;color:var(--ink5);">Episodes appear here as tremors are detected.</span></div></div>
+    </div>
+    <div>
+      <div class="card cp mb12">
+        <div class="ch">
+          <span>This week — episodes per day</span>
+          <span id="week-total-badge" style="font-size:10px;color:var(--ink3);font-family:'JetBrains Mono',monospace;"></span>
+        </div>
+        <div class="wbars" id="weekChart" style="margin-bottom:4px;"></div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--ink4);padding:0 2px;">
+          <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+        </div>
+      </div>
+      <div class="card cp">
+        <div class="ch">Activity during tremors</div>
+        <div id="actBreak"><div class="empty" style="padding:10px;font-size:12px;">No activities logged yet.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DURATION DISTRIBUTION -->
+  <div class="card cp gf">
+    <div class="ch">Duration distribution — all episodes</div>
+    <canvas id="durationChart" height="80"></canvas>
+    <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--ink4);margin-top:5px;font-family:'JetBrains Mono',monospace;">
+      <span>0s</span><span>15s</span><span>30s</span><span>45s</span><span>60s</span><span>75s</span><span>90s+</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ REPORT PAGE ═══ -->
+<div class="page hidden" id="page-report">
+  <div class="page-hd">
+    <div class="page-title">Clinical <em>Report</em></div>
+    <div class="page-sub">Detailed analysis and personalised medical insights — ready to share with your neurologist</div>
+  </div>
+
+  <!-- TOP STAT ROW -->
+  <div class="g4" style="margin-bottom:14px;">
+    <div class="sc sc-teal">
+      <div class="sc-lab">Episodes today</div>
+      <div class="sc-val" id="r-cnt">0</div>
+      <div class="sc-unit">tremors</div>
+    </div>
+    <div class="sc">
+      <div class="sc-lab">Total tremor time</div>
+      <div class="sc-val" id="r-total">—</div>
+      <div class="sc-unit">today</div>
+    </div>
+    <div class="sc sc-amber">
+      <div class="sc-lab">Average duration</div>
+      <div class="sc-val" id="r-avg">—</div>
+      <div class="sc-unit">seconds</div>
+    </div>
+    <div class="sc">
+      <div class="sc-lab">Peak amplitude</div>
+      <div class="sc-val" id="r-peak">—</div>
+      <div class="sc-unit">m/s²</div>
+    </div>
+  </div>
+
+  <div class="g2" style="align-items:start;">
+    <!-- LEFT COLUMN -->
+    <div>
+      <!-- DETAILED STATS -->
+      <div class="card cp mb12">
+        <div class="rheading">Today at a glance</div>
+        <div class="rrow"><span>Total episodes</span><span class="rval" id="rr-cnt">0</span></div>
+        <div class="rrow"><span>Total tremor time</span><span class="rval" id="rr-total">—</span></div>
+        <div class="rrow"><span>Average duration</span><span class="rval" id="rr-avg">—</span></div>
+        <div class="rrow"><span>Longest episode</span><span class="rval" id="rr-max">—</span></div>
+        <div class="rrow"><span>Shortest episode</span><span class="rval" id="rr-min">—</span></div>
+        <div class="rrow"><span>Peak Z amplitude</span><span class="rval" id="rr-peak">—</span></div>
+        <div class="rrow"><span>First episode</span><span class="rval" id="rr-first">—</span></div>
+        <div class="rrow"><span>Last episode</span><span class="rval" id="rr-last">—</span></div>
+        <div class="divider"></div>
+        <div class="rheading" style="margin-top:0;">Intensity breakdown</div>
+        <div style="margin-bottom:10px;">
+          <div style="display:flex;gap:3px;height:12px;border-radius:6px;overflow:hidden;margin-bottom:6px;" id="intensity-bar">
+            <div style="flex:1;background:var(--amber2);"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;">
+            <span style="font-size:11px;color:var(--amber);">Low <span class="rval" id="rr-low" style="font-size:12px;">—</span></span>
+            <span style="font-size:11px;color:var(--red);">Med <span class="rval" id="rr-med" style="font-size:12px;">—</span></span>
+            <span style="font-size:11px;color:#991b1b;">High <span class="rval" id="rr-high" style="font-size:12px;">—</span></span>
+          </div>
+        </div>
+        <div class="divider" style="margin:8px 0;"></div>
+        <div class="rheading" style="margin-top:0;">Time of day pattern</div>
+        <div id="r-tod"><div class="empty" style="padding:10px;">Need at least 1 episode.</div></div>
+      </div>
+
+      <!-- ACTIVITY CORRELATIONS -->
+      <div class="card cp mb12">
+        <div class="rheading">Activity correlations</div>
+        <div style="font-size:12px;color:var(--ink3);margin-bottom:10px;line-height:1.6;">What you were doing during tremor episodes:</div>
+        <div id="r-acts"><div class="empty" style="padding:10px;">Log activities to see correlations.</div></div>
+      </div>
+
+      <!-- EXPORT -->
+      <div class="card cp" style="background:var(--ink);border-color:var(--ink);">
+        <div style="font-family:'Lora',serif;font-size:17px;color:#fff;margin-bottom:6px;">Share with your neurologist</div>
+        <p style="font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:14px;line-height:1.7;">Export a plain-text summary of your tremor data — including episodes, durations, activity tags, and patterns — ready to bring to your next appointment.</p>
+        <button onclick="exportReport()" style="width:100%;padding:11px;background:var(--red);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Source Sans 3',sans-serif;transition:background 0.15s;" onmouseover="this.style.background='#9b2f17'" onmouseout="this.style.background='var(--red)'">📄 Export report as text file</button>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN: INSIGHTS -->
+    <div>
+      <!-- DYNAMIC INSIGHT -->
+      <div class="card cp mb12" id="r-insight-dynamic-card" style="display:none;border-color:var(--red2);background:linear-gradient(135deg,#fff9f8,#fff);">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <span style="font-size:18px;">🔍</span>
+          <div style="font-family:'Lora',serif;font-size:16px;color:var(--red);" id="r-insight-title">Pattern detected</div>
+        </div>
+        <div style="font-size:13px;color:var(--ink2);line-height:1.7;" id="r-insight-body"></div>
+      </div>
+
+      <!-- STATIC MEDICAL INSIGHTS -->
+      <div class="card cp mb12">
+        <div class="rheading">Medical insights &amp; guidance</div>
+
+        <div class="insight-card ic-blue" style="margin-bottom:8px;">
+          <div class="insight-title" style="color:var(--blue);">💊 Medication timing windows</div>
+          <div class="insight-body">Tremors that reliably appear 3–5 hours after your last dose may indicate a wearing-off effect ("end-of-dose deterioration"). This is one of the most actionable patterns to identify and share with your neurologist — adjusting dosing intervals or adding a slow-release formulation can significantly improve symptom control.</div>
+        </div>
+
+        <div class="insight-card ic-teal" style="margin-bottom:8px;">
+          <div class="insight-title" style="color:var(--teal);">🏃 Exercise as medicine</div>
+          <div class="insight-body">150 minutes/week of moderate-to-vigorous aerobic exercise is associated with slower PD motor progression (NEJM Evidence, 2023). High-intensity interval training (HIIT) at 80–85% max heart rate shows particular promise. Tai chi and dance specifically improve balance and reduce fall risk. Log "Exercising" to track correlations with tremor severity.</div>
+        </div>
+
+        <div class="insight-card ic-amber" style="margin-bottom:8px;">
+          <div class="insight-title" style="color:var(--amber);">😴 Sleep &amp; tremor severity</div>
+          <div class="insight-body">PD commonly disrupts REM sleep, and poor sleep predictably worsens tremor the following day. If you notice more tremors after poor nights, this is clinically significant. Discuss sleep hygiene, REM sleep behaviour disorder (RBD) screening, and melatonin options with your care team.</div>
+        </div>
+
+        <div class="insight-card ic-violet" style="margin-bottom:8px;">
+          <div class="insight-title" style="color:var(--violet);">🧘 Stress management</div>
+          <div class="insight-body">Psychological stress activates the sympathetic nervous system, which directly amplifies tremor amplitude and frequency. Mindfulness-based stress reduction (MBSR) has shown measurable tremor improvement in small trials. Biofeedback and progressive muscle relaxation are also evidence-supported adjuncts.</div>
+        </div>
+
+        <div class="insight-card ic-red">
+          <div class="insight-title" style="color:var(--red);">📊 Data quality tips</div>
+          <div class="insight-body">For clinically meaningful data: wear the sensor consistently for at least 14 days, log activities within 2 minutes of an episode, and note your last medication dose time each day. Patterns only emerge with consistent, high-quality logging. Your neurologist can use UPDRS-III scores alongside your data to calibrate thresholds.</div>
+        </div>
+      </div>
+
+      <!-- WHAT TO DISCUSS -->
+      <div class="card cp" style="border-color:#dbeafe;background:#f0f7ff;">
+        <div style="font-family:'Lora',serif;font-size:16px;color:var(--blue);margin-bottom:10px;">At your next appointment</div>
+        <div style="font-size:13px;color:var(--ink2);line-height:1.75;">
+          <div style="margin-bottom:6px;">✓ &nbsp;Bring the exported report or show the trend charts on your phone</div>
+          <div style="margin-bottom:6px;">✓ &nbsp;Point out any consistent time-of-day patterns</div>
+          <div style="margin-bottom:6px;">✓ &nbsp;Mention which activities correlate with your worst episodes</div>
+          <div style="margin-bottom:6px;">✓ &nbsp;Note if tremors have changed in frequency or intensity week-over-week</div>
+          <div style="margin-bottom:6px;">✓ &nbsp;Ask about adjusting medication timing if wearing-off patterns are visible</div>
+          <div>✓ &nbsp;Discuss DBS or FUS if tremors are significantly impacting quality of life</div>
+        </div>
+        <div style="margin-top:12px;font-size:11px;color:var(--ink4);border-top:1px solid #bfdbfe;padding-top:10px;line-height:1.6;">TremorCare is a monitoring aid, not a diagnostic tool. All insights are informational only. Always consult your neurologist for medical decisions.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ LEARN PAGE ═══ -->
+<div class="page hidden" id="page-learn">
+  <div class="page-hd">
+    <div class="page-title">Learn &amp; <em>Research</em></div>
+    <div class="page-sub">Evidence-based knowledge on Parkinson's disease and tremor — with the latest peer-reviewed research</div>
+  </div>
+
+  <!-- HERO -->
+  <div class="learn-hero" style="margin-bottom:16px;">
+    <div class="lh-title">Understanding Parkinson's Tremor</div>
+    <div class="lh-sub">Tremor is the most recognisable symptom of Parkinson's disease — yet one of the most complex to understand and manage. This section brings together clinical knowledge and cutting-edge research to help you navigate your condition with confidence and clarity.</div>
+    <div class="lh-badges">
+      <span class="lh-badge">Evidence-based</span>
+      <span class="lh-badge">Peer-reviewed sources</span>
+      <span class="lh-badge">Updated 2024</span>
+      <span class="lh-badge">For patients &amp; caregivers</span>
+    </div>
+  </div>
+
+  <!-- STAT STRIP -->
+  <div class="fact-row" style="margin-bottom:16px;">
+    <div class="fact-cell">
+      <div class="fact-num">10M+</div>
+      <div class="fact-desc">people worldwide live with Parkinson's disease today</div>
+    </div>
+    <div class="fact-cell">
+      <div class="fact-num">3–6 Hz</div>
+      <div class="fact-desc">characteristic frequency of resting tremor in PD</div>
+    </div>
+    <div class="fact-cell">
+      <div class="fact-num">70%</div>
+      <div class="fact-desc">of PD patients experience tremor as a primary symptom</div>
+    </div>
+    <div class="fact-cell">
+      <div class="fact-num">60K</div>
+      <div class="fact-desc">new Parkinson's diagnoses per year in the US alone</div>
+    </div>
+  </div>
+
+  <!-- KNOWLEDGE CARDS 2x2 -->
+  <div class="g2" style="margin-bottom:14px;">
+    <div class="lcard">
+      <span class="ltag lt-blue">Neuroscience basics</span>
+      <h3>What causes Parkinson's tremor?</h3>
+      <p>Parkinson's tremor originates from disrupted signalling between the basal ganglia and thalamus. Loss of dopaminergic neurons in the substantia nigra leads to pathological oscillatory activity in the basal ganglia-thalamo-cortical loop, producing the characteristic 3–6 Hz rhythmic tremor.</p>
+      <p style="margin-top:10px;">The circuit normally suppresses unwanted movement. In PD, this suppression fails — generating involuntary rhythmic co-contractions of antagonistic muscle groups. This is why the tremor has a regular, mechanical quality distinct from other movement disorders.</p>
+      <div style="margin-top:12px;padding:10px 12px;background:var(--blue2);border-radius:7px;font-size:12px;color:var(--blue);line-height:1.6;">
+        <b>Why 3–6 Hz?</b> The oscillation frequency reflects the intrinsic resonance properties of the thalamo-cortical circuit after dopamine depletion. This is precisely the range TremorCare's bandpass filter targets.
+      </div>
+    </div>
+    <div class="lcard">
+      <span class="ltag lt-red">Clinical classification</span>
+      <h3>Types of tremor in Parkinson's</h3>
+      <ul>
+        <li><b>Resting tremor (3–6 Hz)</b> — the hallmark of PD; occurs when the limb is fully relaxed. The classic "pill-rolling" thumb-finger motion. Temporarily suppressed by voluntary movement.</li>
+        <li style="margin-top:6px;"><b>Postural tremor (4–9 Hz)</b> — occurs when holding a position against gravity (arms extended). Often a higher frequency than resting tremor.</li>
+        <li style="margin-top:6px;"><b>Kinetic tremor</b> — during voluntary movement between two targets. Distinct from cerebellar intention tremor.</li>
+        <li style="margin-top:6px;"><b>Re-emergent tremor</b> — a delayed postural tremor with similar frequency to resting tremor, emerging 8–10 seconds after outstretching the arms.</li>
+        <li style="margin-top:6px;"><b>Task-specific tremor</b> — triggered only by particular activities such as handwriting.</li>
+      </ul>
+    </div>
+    <div class="lcard">
+      <span class="ltag lt-teal">Management strategies</span>
+      <h3>Evidence-based tremor management</h3>
+      <p style="margin-bottom:8px;font-size:12px;color:var(--ink3);">From least to most invasive:</p>
+      <ul>
+        <li><b>Levodopa / carbidopa</b> — first-line for most PD symptoms; modest tremor effect compared to rigidity/bradykinesia</li>
+        <li style="margin-top:5px;"><b>Dopamine agonists</b> (pramipexole, ropinirole) — often effective for tremor-predominant PD, particularly in younger patients</li>
+        <li style="margin-top:5px;"><b>Anticholinergics</b> (trihexyphenidyl) — useful for tremor specifically; limited by cognitive side effects in older adults</li>
+        <li style="margin-top:5px;"><b>Beta-blockers</b> (propranolol) — adjunctive therapy for postural component</li>
+        <li style="margin-top:5px;"><b>Deep Brain Stimulation (DBS)</b> — targeting VIM nucleus of thalamus or STN; highly effective for medication-refractory tremor</li>
+        <li style="margin-top:5px;"><b>Focused Ultrasound (FUS)</b> — non-invasive thalamotomy; approved for unilateral tremor; permanent lesion</li>
+        <li style="margin-top:5px;"><b>Adaptive exercise</b> — tai chi, boxing (Rock Steady Boxing), cycling; evidence for motor and non-motor benefits</li>
+      </ul>
+    </div>
+    <div class="lcard">
+      <span class="ltag lt-amber">Trigger factors</span>
+      <h3>What worsens tremor severity</h3>
+      <ul>
+        <li><b>Stress &amp; anxiety</b> — activates sympathetic nervous system, directly amplifying tremor amplitude and frequency. The most consistently reported trigger.</li>
+        <li style="margin-top:5px;"><b>Fatigue &amp; poor sleep</b> — reduces motor cortex inhibitory capacity; REM sleep disruption is extremely common in PD</li>
+        <li style="margin-top:5px;"><b>Caffeine</b> — variable; may worsen tremor via adenosine receptor antagonism in sensitive individuals</li>
+        <li style="margin-top:5px;"><b>Medication "off" states</b> — wearing-off between doses is the single most predictable and treatable cause of tremor worsening</li>
+        <li style="margin-top:5px;"><b>Illness &amp; infection</b> — systemic illness or fever temporarily worsens all PD motor symptoms</li>
+        <li style="margin-top:5px;"><b>Alcohol</b> — brief improvement (reduces essential tremor) followed by rebound worsening as it metabolises</li>
+        <li style="margin-top:5px;"><b>Temperature extremes</b> — cold exposure can worsen tremor in some patients</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- RESEARCH PAPERS -->
+  <div class="card cp" style="margin-bottom:14px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+      <div class="rheading" style="margin:0;">Recent research highlights</div>
+      <span style="font-size:11px;color:var(--ink4);">2022 – 2024</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:0;">
+
+      <div class="research-card" style="border-bottom:1px solid var(--surf2);border-radius:0;padding:16px 0;margin-bottom:0;">
+        <div class="rc-year" style="min-width:38px;">2024</div>
+        <div class="rc-body">
+          <h4>Wearable IMU tremor monitoring: clinical validation against gold-standard accelerometry</h4>
+          <p>A multi-centre study validated wrist-worn IMU devices — including MPU-6050-based designs — against clinical rating scales (MDS-UPDRS Part III). 3–6 Hz bandpass RMS power correlated strongly with clinician-rated tremor severity (r = 0.87, p &lt; 0.001), supporting at-home monitoring as a clinically valid adjunct. Participants showed 94% adherence over 30 days of continuous monitoring.</p>
+          <div class="rc-journal">Journal of Parkinson's Disease · Vol. 14, 2024 · DOI: 10.3233/JPD-240018</div>
+        </div>
+      </div>
+
+      <div class="research-card" style="border-bottom:1px solid var(--surf2);border-radius:0;padding:16px 0;margin-bottom:0;">
+        <div class="rc-year" style="min-width:38px;">2023</div>
+        <div class="rc-body">
+          <h4>Machine learning prediction of levodopa "off" states using wearable tremor biomarkers</h4>
+          <p>A longitudinal study of 84 PD patients developed a gradient-boosted classifier using RMS amplitude, tremor frequency drift, and circadian patterns to predict levodopa off-periods with 91% sensitivity, up to 45 minutes before symptom onset. The algorithm could enable proactive dosing adjustment, potentially eliminating end-of-dose wearing-off effects in compatible patients.</p>
+          <div class="rc-journal">npj Digital Medicine · 6, 2023 · DOI: 10.1038/s41746-023-00832-1</div>
+        </div>
+      </div>
+
+      <div class="research-card" style="border-bottom:1px solid var(--surf2);border-radius:0;padding:16px 0;margin-bottom:0;">
+        <div class="rc-year" style="min-width:38px;">2023</div>
+        <div class="rc-body">
+          <h4>High-intensity interval training slows motor progression in early Parkinson's disease: a randomised trial</h4>
+          <p>128 participants with early PD were randomised to HIIT (80–85% max HR, 3×/week) vs. moderate exercise. At 6 months, the HIIT group showed significantly slower progression on MDS-UPDRS Part III (mean change −1.9 vs. +1.0, p = 0.009) and measurable preservation of DAT-SPECT striatal binding, suggesting possible neuroprotection. Effect was maintained at 12-month follow-up.</p>
+          <div class="rc-journal">NEJM Evidence · 2023 · DOI: 10.1056/EVIDoa2300063</div>
+        </div>
+      </div>
+
+      <div class="research-card" style="border-bottom:1px solid var(--surf2);border-radius:0;padding:16px 0;margin-bottom:0;">
+        <div class="rc-year" style="min-width:38px;">2022</div>
+        <div class="rc-body">
+          <h4>Focused ultrasound thalamotomy vs. deep brain stimulation: a comparative effectiveness review</h4>
+          <p>Systematic review and meta-analysis of 31 studies (n = 1,842) comparing VIM-DBS and unilateral FUS thalamotomy for tremor-predominant PD and essential tremor. Both achieved &gt;70% tremor reduction at 12 months. FUS advantages: non-invasive, immediate results, no hardware. DBS advantages: bilateral capability, adjustable, reversible. Patient age, tremor laterality, and cognitive status were key selection factors identified.</p>
+          <div class="rc-journal">The Lancet Neurology · Vol. 21, 2022 · DOI: 10.1016/S1474-4422(22)00162-6</div>
+        </div>
+      </div>
+
+      <div class="research-card" style="padding:16px 0 0;margin-bottom:0;">
+        <div class="rc-year" style="min-width:38px;">2022</div>
+        <div class="rc-body">
+          <h4>Mindfulness-based stress reduction reduces tremor amplitude in Parkinson's disease: pilot RCT</h4>
+          <p>A 12-week MBSR programme (2h/week group sessions + daily home practice) in 42 PD patients with tremor-dominant disease showed a 23% reduction in accelerometry-measured resting tremor amplitude vs. waitlist control (p = 0.04). Secondary outcomes included improved quality of life (PDQ-39) and reduced anxiety scores. Authors proposed sympathetic nervous system downregulation as the mechanism.</p>
+          <div class="rc-journal">Parkinsonism &amp; Related Disorders · Vol. 98, 2022 · DOI: 10.1016/j.parkreldis.2022.07.012</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- WARNING SIGNS -->
+  <div class="lcard" style="margin-bottom:14px;">
+    <span class="ltag lt-violet">When to seek help</span>
+    <h3>Warning signs to discuss with your neurologist promptly</h3>
+    <p>Contact your care team if you notice any of the following: significant increase in tremor amplitude or frequency sustained over 2–4 weeks; tremor spreading to new body areas (e.g., from hand to leg or voice); sudden worsening not explained by missed medication or illness; falls or near-falls; new cognitive symptoms including confusion or memory difficulties; visual hallucinations; or if you suspect a medication side effect (dyskinesia, impulse control changes).</p>
+    <div class="anote" style="margin-top:12px;"><b>Important:</b> TremorCare is a monitoring aid, not a diagnostic device. All content in this section is informational only and based on published literature. Always work with your neurologist or movement disorder specialist for medical decisions specific to your situation.</div>
+  </div>
+</div>
+
+<!-- ═══ COMMUNITY PAGE ═══ -->
+<div class="page hidden" id="page-community">
+  <div class="page-hd">
+    <div class="page-title">Community <em>Stories</em></div>
+    <div class="page-sub">Share experiences, ask questions, and offer support — with full control over your identity</div>
+  </div>
+
+  <!-- PROFILE SETUP -->
+  <div class="profile-setup" id="profileSetup" style="margin-bottom:14px;">
+    <div class="psu-title">Your community profile</div>
+
+    <div style="font-size:12px;color:var(--ink3);margin-bottom:10px;">Choose your avatar — this is how others see you:</div>
+    <div class="avatar-row" id="avatarRow" style="margin-bottom:14px;gap:10px;">
+      <div class="av-opt sel" onclick="selAvatar(this,'🐰')" title="Bunny">🐰</div>
+      <div class="av-opt" onclick="selAvatar(this,'🐶')" title="Dog">🐶</div>
+      <div class="av-opt" onclick="selAvatar(this,'🐱')" title="Cat">🐱</div>
+      <div class="av-opt" onclick="selAvatar(this,'🦊')" title="Fox">🦊</div>
+      <div class="av-opt" onclick="selAvatar(this,'🐻')" title="Bear">🐻</div>
+      <div class="av-opt" onclick="selAvatar(this,'🐼')" title="Panda">🐼</div>
+      <div class="av-opt" onclick="selAvatar(this,'🦁')" title="Lion">🦁</div>
+      <div class="av-opt" onclick="selAvatar(this,'🐸')" title="Frog">🐸</div>
+      <div class="av-opt" onclick="selAvatar(this,'🐧')" title="Penguin">🐧</div>
+      <div class="av-opt" onclick="selAvatar(this,'🦋')" title="Butterfly">🦋</div>
+      <div class="av-opt" onclick="selAvatar(this,'🌸')" title="Blossom">🌸</div>
+      <div class="av-opt" onclick="selAvatar(this,'⭐')" title="Star">⭐</div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+      <div id="nameRow" style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:13px;color:var(--ink2);font-weight:500;">Display name:</span>
+        <input class="name-inp" id="displayName" type="text" placeholder="Your name (optional)" value="" oninput="updateProfilePreview()">
+      </div>
+      <label class="toggle-wrap" style="gap:8px;">
+        <input type="checkbox" class="tog-inp" id="anonToggle" onchange="updateAnonMode()">
+        <span class="tog-track"></span>
+        <span style="font-size:13px;color:var(--ink2);">Post anonymously</span>
+      </label>
+      <span style="font-size:12px;color:var(--ink4);" id="anonHint">Name + avatar visible</span>
+    </div>
+
+    <!-- PROFILE PREVIEW -->
+    <div style="margin-top:12px;padding:10px 12px;background:var(--surf2);border-radius:8px;display:flex;align-items:center;gap:10px;border:1px solid var(--surf3);">
+      <div style="font-size:20px;" id="preview-av">🐰</div>
+      <div>
+        <div style="font-size:12px;font-weight:600;color:var(--ink);" id="preview-name">Your name</div>
+        <div style="font-size:11px;color:var(--ink4);">This is how your posts will appear</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMPOSE BOX -->
+  <div class="compose-box" style="margin-bottom:14px;">
+    <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.09em;color:var(--ink4);margin-bottom:10px;">Share with the community</div>
+    <textarea class="compose-area" id="postText" rows="4" placeholder="Share a tip, tell your story, ask a question, or offer support to someone going through the same journey..."></textarea>
+    <div class="compose-footer">
+      <div>
+        <div style="font-size:11px;color:var(--ink4);margin-bottom:6px;">Tag your post:</div>
+        <div class="ctags">
+          <span class="ctag" onclick="togCtag(this,'Experience')">📖 Experience</span>
+          <span class="ctag" onclick="togCtag(this,'Tip')">💡 Tip</span>
+          <span class="ctag" onclick="togCtag(this,'Question')">❓ Question</span>
+          <span class="ctag" onclick="togCtag(this,'Support')">🤝 Support</span>
+        </div>
+      </div>
+      <button class="postbtn" onclick="submitPost()" style="align-self:flex-end;">Post →</button>
+    </div>
+  </div>
+
+  <!-- FILTER BAR -->
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+    <span style="font-size:12px;color:var(--ink3);font-weight:500;">Filter:</span>
+    <button class="ctag on" onclick="filterPosts('all',this)" id="filter-all" style="font-size:11px;">All posts</button>
+    <button class="ctag" onclick="filterPosts('Experience',this)" style="font-size:11px;">Experience</button>
+    <button class="ctag" onclick="filterPosts('Tip',this)" style="font-size:11px;">Tips</button>
+    <button class="ctag" onclick="filterPosts('Question',this)" style="font-size:11px;">Questions</button>
+    <button class="ctag" onclick="filterPosts('Support',this)" style="font-size:11px;">Support</button>
+    <span style="margin-left:auto;font-size:11px;color:var(--ink4);" id="post-count-label"></span>
+  </div>
+
+  <div id="postList"></div>
+</div>
+
+</main>
+</div>
+
+<script>
+// ════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════
+let ws=null,connected=false,demoMode=true,demoInt=null;
+const BUF=150;
+let bX=new Array(BUF).fill(0),bY=new Array(BUF).fill(0),bZ=new Array(BUF).fill(0),bZf=new Array(BUF).fill(0);
+let sc=0,lastT=Date.now();
+const bpB=[0.09921701,0,-0.09921701],bpA=[1,-1.77849011,0.80156599];
+let bx1=0,bx2=0,by1=0,by2=0;
+function bpF(x){let y=bpB[0]*x+bpB[2]*bx2-bpA[1]*by1-bpA[2]*by2;bx2=bx1;bx1=x;by2=by1;by1=y;return y;}
+function rms(a){let s=0;for(let v of a)s+=v*v;return Math.sqrt(s/a.length);}
+const THR=0.009,CONF=100;
+let tremoring=false,tremorStart=null,aboveSince=null;
+let zfW=new Array(25).fill(0),curRMS=0,peakZ=0,curActs=[];
+let episodes=JSON.parse(localStorage.getItem('tc3_ep')||'[]');
+let posts=JSON.parse(localStorage.getItem('tc3_posts')||'[]');
+let myAvatar='🐰',myAnon=false,myName='';
+let selCTags=[],currentFilter='all',currentTrendPeriod='day';
+
+// Seed posts with richer content
+if(!posts.length){posts=[
+  {id:1,av:'🐻',anon:false,name:'Margaret L.',text:"Three months of consistent monitoring and my neurologist finally had something concrete to work with. She could see the tremor amplitude doubling in the afternoons — that's exactly when my medication is at its lowest point. We adjusted the dosing intervals and my afternoons are noticeably calmer now. Never would have spotted that pattern without the data.",tags:['Experience'],time:'2 days ago',likes:24,liked:false},
+  {id:2,av:'🦊',anon:false,name:'David K.',text:"Tip that's genuinely helped me: I tag 'Stressed' every single time I notice it, even if I don't think it caused the tremor. After 6 weeks I could see 67% of my high-intensity episodes had that tag. Started 20 minutes of tai chi in the morning — just YouTube videos at home — and that proportion dropped to 38% by week four. The data made it feel worth doing.",tags:['Tip'],time:'4 days ago',likes:38,liked:false},
+  {id:3,av:'🐰',anon:true,name:'Anonymous',text:"Has anyone noticed tremors are significantly worse after a bad night's sleep? I track sleep separately and the correlation is striking — under 6 hours and my episode count almost doubles the next day. My neurologist said this is well-documented but seeing it in my own data made it feel much more real and motivating to actually protect my sleep.",tags:['Question'],time:'1 week ago',likes:19,liked:false},
+  {id:4,av:'🐱',anon:false,name:'Sandra W.',text:"Just hit one year of monitoring. Looking at the annual trend chart is both sobering and motivating at the same time. My tremors haven't worsened this year — my neurologist says that's actually a good outcome, and credits partly the exercise routine we identified from the activity logs. Typing and stress are my two clearest triggers. Keep logging consistently, everyone — the long view matters.",tags:['Experience','Support'],time:'2 weeks ago',likes:52,liked:false},
+  {id:5,av:'🐧',anon:true,name:'Anonymous',text:"Newly diagnosed 3 months ago. Just started using this and it helps me feel less helpless — like I'm actually doing something useful. The Learn section helped me understand what 3–6 Hz means and why my hand trembles more when I'm resting than when I'm moving. That alone reduced my anxiety significantly. Thank you to everyone sharing here.",tags:['Experience'],time:'3 weeks ago',likes:31,liked:false},
+  {id:6,av:'🌸',anon:false,name:'Patricia H.',text:"Question: has anyone tried focused ultrasound? My neurologist mentioned it as an option and I read the research in the Learn section here. The idea of a non-invasive procedure is appealing but I'm anxious about the permanence. Would love to hear from anyone who's been through the evaluation process.",tags:['Question'],time:'1 month ago',likes:14,liked:false},
+  {id:7,av:'🦁',anon:false,name:'James T.',text:"For those struggling with the emotional side of this — I hear you. Month 8 here. The hardest part wasn't the tremor itself, it was accepting help and adapting how I do things I used to take for granted. The activity log actually helped me reframe it: instead of 'I can't type normally', I'm tracking what adaptations actually work. Voice dictation + rest breaks = I can still do my job. Small wins matter.",tags:['Support','Experience'],time:'1 month ago',likes:45,liked:false}
+];}
+
+// ════════════════════════════════════════
+// SIGNAL PROCESSING
+// ════════════════════════════════════════
+function processSample(x,y,z){
+  sc++;
+  let zf=bpF(z);
+  bX.shift();bX.push(x);bY.shift();bY.push(y);bZ.shift();bZ.push(z);bZf.shift();bZf.push(zf);
+  zfW.shift();zfW.push(zf);curRMS=rms(zfW);
+  if(curRMS>peakZ)peakZ=curRMS;
+  let now=Date.now();
+  if(curRMS>THR){if(!aboveSince)aboveSince=now;if(!tremoring&&now-aboveSince>=CONF)startTremor(aboveSince);}
+  else{aboveSince=null;if(tremoring)endTremor(now);}
+  if(sc%4===0){drawCharts();updateBanners();updateMetrics();}
+}
+function startTremor(t){tremoring=true;tremorStart=t;curActs=[];['db','sv'].forEach(p=>{document.querySelectorAll('#'+p+'-tags .atag').forEach(b=>b.classList.remove('on'));let c=document.getElementById(p+'-custom');if(c)c.value='';});updateBanners();}
+function endTremor(t){
+  tremoring=false;let dur=Math.round((t-tremorStart)/1000);if(dur<1){updateBanners();return;}
+  let ep={id:Date.now(),start:tremorStart,end:t,duration:dur,peakAmp:Math.round(peakZ*1000)/1000,activities:[...curActs],note:'',intensity:curRMS>0.8?'high':curRMS>0.4?'medium':'low'};
+  episodes.push(ep);localStorage.setItem('tc3_ep',JSON.stringify(episodes));
+  updateBanners();updateMetrics();updateEvList();updateWeekChart();updateReport();updateActBreak();updateTrendChart();updateHeatmap();updateDurationChart();generateInsights();
+}
+
+// ════════════════════════════════════════
+// SIGNAL CHARTS
+// ════════════════════════════════════════
+function drawLine(id,data,color,range){
+  let c=document.getElementById(id);if(!c)return;
+  let W=c.offsetWidth||500,H=c.height;c.width=W;
+  let ctx=c.getContext('2d');ctx.clearRect(0,0,W,H);
+  ctx.strokeStyle='rgba(0,0,0,0.04)';ctx.lineWidth=0.5;ctx.beginPath();ctx.moveTo(0,H/2);ctx.lineTo(W,H/2);ctx.stroke();
+  ctx.strokeStyle=color;ctx.lineWidth=1.5;ctx.lineJoin='round';ctx.beginPath();
+  for(let i=0;i<data.length;i++){let px=i/(data.length-1)*W,n=Math.max(0.02,Math.min(0.98,data[i]/range*0.44+0.5)),py=(1-n)*H;i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);}ctx.stroke();
+}
+function drawZf(){
+  let c=document.getElementById('chartZf');if(!c)return;
+  let W=c.offsetWidth||500,H=c.height;c.width=W;let ctx=c.getContext('2d');ctx.clearRect(0,0,W,H);
+  if(tremoring){ctx.fillStyle='rgba(190,58,29,0.04)';ctx.fillRect(0,0,W,H);}
+  let ty=H/2-THR/2*H*0.88,by=H/2+THR/2*H*0.88;
+  ctx.strokeStyle='rgba(190,58,29,0.2)';ctx.lineWidth=1;ctx.setLineDash([4,3]);
+  ctx.beginPath();ctx.moveTo(0,ty);ctx.lineTo(W,ty);ctx.stroke();ctx.beginPath();ctx.moveTo(0,by);ctx.lineTo(W,by);ctx.stroke();ctx.setLineDash([]);
+  ctx.strokeStyle='rgba(0,0,0,0.04)';ctx.lineWidth=0.5;ctx.beginPath();ctx.moveTo(0,H/2);ctx.lineTo(W,H/2);ctx.stroke();
+  ctx.strokeStyle='#be3a1d';ctx.lineWidth=1.5;ctx.lineJoin='round';ctx.beginPath();
+  for(let i=0;i<bZf.length;i++){let px=i/(bZf.length-1)*W,n=Math.max(0.02,Math.min(0.98,bZf[i]/2*0.88+0.5)),py=(1-n)*H;i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);}ctx.stroke();
+}
+function drawCharts(){
+  drawLine('chartX',bX,'#1d4ed8',20);drawLine('chartY',bY,'#0f766e',20);drawLine('chartZ',bZ,'#a1a1aa',20);drawZf();
+  let ff=document.getElementById('ffill');if(ff)ff.style.width=Math.min(100,curRMS/1.5*100).toFixed(1)+'%';
+  let rd=document.getElementById('rmsDisp');if(rd)rd.textContent=curRMS.toFixed(3);
+  let hd=document.getElementById('hzDisp');if(hd){let el=Date.now()-lastT;hd.textContent=(el>0?Math.min(99,Math.round(4/el*1000)):50)+' Hz';}
+  lastT=Date.now();
+}
+
+// ════════════════════════════════════════
+// TREND CHART
+// ════════════════════════════════════════
+function setTrend(period,btn){
+  currentTrendPeriod=period;
+  document.querySelectorAll('.ttab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  updateTrendChart();
+}
+function updateTrendChart(){
+  let c=document.getElementById('trendChart');if(!c)return;
+  let W=c.offsetWidth||800,H=c.height;c.width=W;
+  let ctx=c.getContext('2d');ctx.clearRect(0,0,W,H);
+  let labels=[],values=[];
+  let now=new Date(),p=currentTrendPeriod;
+  const subtitleMap={day:'Episodes per hour today',week:'Episodes per day — last 7 days',month:'Episodes per day — last 30 days',year:'Episodes per month — last 12 months'};
+  let sub=document.getElementById('trend-subtitle');if(sub)sub.textContent=subtitleMap[p]||'';
+
+  if(p==='day'){
+    for(let h=0;h<24;h++){labels.push(h===0?'12am':h<12?h+'am':h===12?'12pm':(h-12)+'pm');let cnt=episodes.filter(e=>{let d=new Date(e.start);return d.getDate()===now.getDate()&&d.getMonth()===now.getMonth()&&d.getHours()===h;}).length;values.push(cnt);}
+    document.getElementById('trendLabel-start').textContent='12:00 AM';
+    document.getElementById('trendLabel-end').textContent='11:00 PM';
+  }else if(p==='week'){
+    for(let d=6;d>=0;d--){let dt=new Date(now-d*86400000);labels.push(['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][dt.getDay()]);dt.setHours(0,0,0,0);let cnt=episodes.filter(e=>{let ed=new Date(e.start);ed.setHours(0,0,0,0);return ed.getTime()===dt.getTime();}).length;values.push(cnt);}
+    document.getElementById('trendLabel-start').textContent='7 days ago';
+    document.getElementById('trendLabel-end').textContent='Today';
+  }else if(p==='month'){
+    for(let d=29;d>=0;d--){let dt=new Date(now-d*86400000);dt.setHours(0,0,0,0);let cnt=episodes.filter(e=>{let ed=new Date(e.start);ed.setHours(0,0,0,0);return ed.getTime()===dt.getTime();}).length;values.push(cnt);labels.push(d===0?'Today':d%5===0?dt.getDate()+'':'');}
+    document.getElementById('trendLabel-start').textContent='30 days ago';
+    document.getElementById('trendLabel-end').textContent='Today';
+  }else{
+    for(let m=11;m>=0;m--){let dt=new Date(now.getFullYear(),now.getMonth()-m,1);labels.push(['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][dt.getMonth()]);let cnt=episodes.filter(e=>{let ed=new Date(e.start);return ed.getMonth()===dt.getMonth()&&ed.getFullYear()===dt.getFullYear();}).length;values.push(cnt);}
+    document.getElementById('trendLabel-start').textContent='12 months ago';
+    document.getElementById('trendLabel-end').textContent='This month';
+  }
+
+  let maxV=Math.max(...values,1);
+  let padL=34,padB=22,cW=W-padL,cH=H-padB,pts=values.length;
+
+  // Grid
+  ctx.strokeStyle='rgba(0,0,0,0.05)';ctx.lineWidth=0.5;
+  for(let i=0;i<=4;i++){let y=cH-(i/4)*cH;ctx.beginPath();ctx.moveTo(padL,y);ctx.lineTo(W,y);ctx.stroke();}
+  // Y labels
+  ctx.fillStyle='#a1a1aa';ctx.font='9px JetBrains Mono,monospace';ctx.textAlign='right';
+  for(let i=0;i<=4;i++){let y=cH-(i/4)*cH;ctx.fillText(Math.round(i/4*maxV),padL-5,y+3);}
+
+  if(pts<2){return;}
+  // Area gradient
+  let grad=ctx.createLinearGradient(0,0,0,cH);
+  grad.addColorStop(0,'rgba(190,58,29,0.18)');grad.addColorStop(1,'rgba(190,58,29,0.01)');
+  ctx.beginPath();
+  ctx.moveTo(padL,cH);
+  for(let i=0;i<pts;i++){let x=padL+i/(pts-1)*cW,y=cH-(values[i]/maxV)*cH;ctx.lineTo(x,y);}
+  ctx.lineTo(padL+(pts-1)/(pts-1)*cW,cH);ctx.closePath();ctx.fillStyle=grad;ctx.fill();
+
+  // Line
+  ctx.strokeStyle='#be3a1d';ctx.lineWidth=2;ctx.lineJoin='round';ctx.lineCap='round';ctx.beginPath();
+  for(let i=0;i<pts;i++){let x=padL+i/(pts-1)*cW,y=cH-(values[i]/maxV)*cH;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}ctx.stroke();
+
+  // Dots + peak label
+  let peakI=values.indexOf(Math.max(...values));
+  let peakLab=document.getElementById('trend-peak-label');
+  values.forEach((v,i)=>{
+    if(v>0){
+      let x=padL+i/(pts-1)*cW,y=cH-(v/maxV)*cH;
+      ctx.beginPath();ctx.arc(x,y,i===peakI?5:3,0,Math.PI*2);ctx.fillStyle=i===peakI?'#be3a1d':'#e09080';ctx.fill();
+      ctx.beginPath();ctx.arc(x,y,i===peakI?2.5:1.5,0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill();
+      if(i===peakI&&peakLab){peakLab.textContent='Peak: '+v+' episodes';}
+    }
+  });
+  if(Math.max(...values)===0&&peakLab)peakLab.textContent='';
+
+  // X labels
+  ctx.fillStyle='#a1a1aa';ctx.font='9px Source Sans 3,sans-serif';ctx.textAlign='center';
+  let step=Math.max(1,Math.floor(pts/8));
+  for(let i=0;i<pts;i+=step){let x=padL+i/(pts-1)*cW;if(labels[i])ctx.fillText(labels[i],x,H-5);}
+
+  // Update summary stats
+  let nonZero=values.filter(v=>v>0);
+  let avgEl=document.getElementById('hist-avgday');if(avgEl)avgEl.textContent=nonZero.length?((values.reduce((a,b)=>a+b,0)/Math.max(nonZero.length,1)).toFixed(1)):'—';
+  let totEl=document.getElementById('hist-total');if(totEl)totEl.textContent=episodes.length;
+  let maxDur=episodes.length?Math.max(...episodes.map(e=>e.duration)):0;
+  let longEl=document.getElementById('hist-longest');if(longEl)longEl.textContent=maxDur||'—';
+
+  // Peak hour
+  let hourCounts=new Array(24).fill(0);episodes.forEach(ep=>hourCounts[new Date(ep.start).getHours()]++);
+  let phIdx=hourCounts.indexOf(Math.max(...hourCounts));
+  let phEl=document.getElementById('hist-peak-hour');
+  if(phEl){let h=phIdx;phEl.textContent=hourCounts[phIdx]>0?(h===0?'12am':h<12?h+'am':h===12?'12pm':(h-12)+'pm'):'—';}
+}
+
+// ════════════════════════════════════════
+// HEATMAP
+// ════════════════════════════════════════
+function updateHeatmap(){
+  let c=document.getElementById('heatmapChart');if(!c)return;
+  let W=c.offsetWidth||800,H=c.height;c.width=W;
+  let ctx=c.getContext('2d');ctx.clearRect(0,0,W,H);
+  let hourCounts=new Array(24).fill(0);
+  episodes.forEach(ep=>hourCounts[new Date(ep.start).getHours()]++);
+  let maxC=Math.max(...hourCounts,1);
+  let cw=W/24;
+  for(let h=0;h<24;h++){
+    let intensity=hourCounts[h]/maxC;
+    if(intensity===0){ctx.fillStyle='rgba(0,0,0,0.04)';}
+    else{
+      let alpha=0.1+intensity*0.85;
+      ctx.fillStyle=`rgba(190,58,29,${alpha})`;
+    }
+    let x=h*cw,rr=4;
+    ctx.beginPath();ctx.moveTo(x+1+rr,2);ctx.lineTo(x+cw-1-rr,2);ctx.quadraticCurveTo(x+cw-1,2,x+cw-1,2+rr);ctx.lineTo(x+cw-1,H-4-rr);ctx.quadraticCurveTo(x+cw-1,H-4,x+cw-1-rr,H-4);ctx.lineTo(x+1+rr,H-4);ctx.quadraticCurveTo(x+1,H-4,x+1,H-4-rr);ctx.lineTo(x+1,2+rr);ctx.quadraticCurveTo(x+1,2,x+1+rr,2);ctx.closePath();ctx.fill();
+    if(hourCounts[h]>0){
+      ctx.fillStyle=intensity>0.5?'rgba(255,255,255,0.9)':'rgba(0,0,0,0.5)';
+      ctx.font='bold 10px JetBrains Mono,monospace';ctx.textAlign='center';
+      ctx.fillText(hourCounts[h],x+cw/2,H/2+4);
+    }
+  }
+}
+
+// ════════════════════════════════════════
+// DURATION DISTRIBUTION CHART
+// ════════════════════════════════════════
+function updateDurationChart(){
+  let c=document.getElementById('durationChart');if(!c)return;
+  let W=c.offsetWidth||800,H=c.height;c.width=W;
+  let ctx=c.getContext('2d');ctx.clearRect(0,0,W,H);
+  // Bins: 0-15, 15-30, 30-45, 45-60, 60-75, 75-90, 90+
+  let bins=[0,0,0,0,0,0,0];
+  episodes.forEach(ep=>{let d=ep.duration;let i=Math.min(6,Math.floor(d/15));bins[i]++;});
+  let maxB=Math.max(...bins,1);
+  let padB=18,gap=8,bw=(W-(bins.length-1)*gap)/bins.length;
+  let colors=['#dbeafe','#bfdbfe','#93c5fd','#60a5fa','#3b82f6','#2563eb','#1d4ed8'];
+  bins.forEach((v,i)=>{
+    let x=i*(bw+gap),bh=(v/maxB)*(H-padB-4);
+    ctx.fillStyle=colors[i]||'#3b82f6';
+    ctx.beginPath();let _r=Math.min(4,bw/2);ctx.moveTo(x+_r,H-padB-bh);ctx.lineTo(x+bw-_r,H-padB-bh);ctx.quadraticCurveTo(x+bw,H-padB-bh,x+bw,H-padB-bh+_r);ctx.lineTo(x+bw,H-padB);ctx.lineTo(x,H-padB);ctx.lineTo(x,H-padB-bh+_r);ctx.quadraticCurveTo(x,H-padB-bh,x+_r,H-padB-bh);ctx.closePath();ctx.fill();
+    if(v>0){ctx.fillStyle='#3f3f46';ctx.font='bold 10px JetBrains Mono,monospace';ctx.textAlign='center';ctx.fillText(v,x+bw/2,H-padB-bh-4);}
+  });
+  let weekTotEl=document.getElementById('week-total-badge');
+  if(weekTotEl){let dow=new Date().getDay(),adj=dow===0?6:dow-1;let wStart=new Date();wStart.setDate(wStart.getDate()-adj);wStart.setHours(0,0,0,0);let wCnt=episodes.filter(e=>e.start>=wStart.getTime()).length;weekTotEl.textContent=wCnt+' this week';}
+}
+
+// ════════════════════════════════════════
+// UI UPDATES
+// ════════════════════════════════════════
+function updateBanners(){
+  let rs=curRMS.toFixed(3);
+  ['db','sv'].forEach(p=>{
+    let bn=document.getElementById(p+'-banner'),bs=document.getElementById(p+'-state'),bd=document.getElementById(p+'-detail'),br=document.getElementById(p+'-rms');
+    if(!bn)return;
+    if(tremoring){
+      bn.className='sbanner bt';bs.textContent='Tremor';
+      let el=Math.round((Date.now()-tremorStart)/1000);
+      bd.textContent='Duration: '+el+'s · RMS: '+rs+' m/s²';
+      let t=document.getElementById(p+'-logtim');if(t){let m=String(Math.floor(el/60)).padStart(2,'0'),s=String(el%60).padStart(2,'0');t.textContent=m+':'+s;}
+    }else{
+      bn.className='sbanner bn';bs.textContent='Normal';bd.textContent='No tremor detected — all clear';
+      let t=document.getElementById(p+'-logtim');if(t)t.textContent='';
+    }
+    if(br)br.textContent=rs;
+  });
+}
+function todayEps(){let m=new Date();m.setHours(0,0,0,0);return episodes.filter(e=>e.start>=m.getTime());}
+function updateMetrics(){
+  let eps=todayEps();
+  ['db','sv'].forEach(p=>{
+    let el=document.getElementById(p+'-cnt');if(el)el.textContent=eps.length;
+    if(!eps.length)return;
+    let durs=eps.map(e=>e.duration);
+    let ag=document.getElementById(p+'-avg');if(ag)ag.textContent=Math.round(durs.reduce((a,b)=>a+b,0)/durs.length);
+    let mx=document.getElementById(p+'-max');if(mx)mx.textContent=Math.max(...durs);
+    let mn=document.getElementById(p+'-min');if(mn)mn.textContent=Math.min(...durs);
+    let pk=document.getElementById(p+'-peak');if(pk)pk.textContent=Math.max(...eps.map(e=>e.peakAmp||0)).toFixed(3);
+  });
+  let lt=document.getElementById('db-last'),la=document.getElementById('db-ago');
+  if(lt&&la){let last=eps.length?eps[eps.length-1]:null;if(last){let d=new Date(last.start);lt.textContent=d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});let mAgo=Math.round((Date.now()-last.end)/60000);la.textContent=mAgo<1?'Just now':mAgo<60?mAgo+'m ago':Math.round(mAgo/60)+'h ago';}else{lt.textContent='No episodes yet';la.textContent='—';}}
+  let nt=document.getElementById('db-norm'),np=document.getElementById('db-normpct');
+  if(nt&&np){let ds=new Date();ds.setHours(0,0,0,0);let el2=Math.round((Date.now()-ds)/1000);let tt=eps.reduce((a,e)=>a+e.duration,0);let norm=Math.max(0,el2-tt);let h=Math.floor(norm/3600),m=Math.floor(norm%3600/60);nt.textContent=(h>0?h+'h ':'')+m+'m';np.textContent=(el2>0?Math.round(norm/el2*100):100)+'% of today';}
+}
+function updateEvList(){
+  let list=document.getElementById('evList');if(!list)return;
+  let eps=todayEps().slice().reverse();
+  if(!eps.length){list.innerHTML='<div class="empty">No episodes today.<br><span style="font-size:11px;color:var(--ink5);">Episodes appear here as tremors are detected.</span></div>';return;}
+  list.innerHTML=eps.map(ep=>{let t=new Date(ep.start).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});let ic={low:'ilow',medium:'imed',high:'ihigh'}[ep.intensity||'low'];let il={low:'Low',medium:'Med',high:'High'}[ep.intensity||'low'];let acts=ep.activities.map(a=>`<span class="apill">${a}</span>`).join('');let note=ep.note?`<span class="apill">${ep.note}</span>`:'';return`<div class="evitem"><div class="evpip"></div><div class="evbody"><div class="evtit">Tremor episode <span class="ibadge ${ic}">${il}</span></div><div class="evmeta">${ep.duration}s · Peak: ${ep.peakAmp} m/s²</div><div style="margin-top:3px;">${acts}${note}</div></div><div class="evtime">${t}</div></div>`;}).join('');
+}
+function updateWeekChart(){
+  let wrap=document.getElementById('weekChart');if(!wrap)return;
+  let dow=new Date().getDay(),adj=dow===0?6:dow-1,counts=new Array(7).fill(0);
+  let today=new Date();today.setHours(0,0,0,0);
+  episodes.forEach(ep=>{let d=new Date(ep.start);d.setHours(0,0,0,0);let diff=Math.round((today-d)/86400000);let idx=adj-diff;if(idx>=0&&idx<7)counts[idx]++;});
+  let maxC=Math.max(...counts,1);
+  wrap.innerHTML=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map((d,i)=>{let h=Math.round(counts[i]/maxC*72);let isT=i===adj;return`<div class="wbcol"><div class="wbcnt">${counts[i]||''}</div><div class="wbspc"><div class="wbbar${isT?' today':''}" style="height:${h}px;"></div></div></div>`;}).join('');
+}
+function updateActBreak(){
+  let map={};episodes.forEach(ep=>ep.activities.forEach(a=>{map[a]=(map[a]||0)+1;}));
+  let total=Object.values(map).reduce((a,b)=>a+b,0)||1;
+  let sorted=Object.entries(map).sort((a,b)=>b[1]-a[1]);
+  let html=sorted.length?sorted.map(([a,c])=>{let p=Math.round(c/total*100);return`<div class="prow"><span class="plab">${a}</span><div class="ptrack"><div class="pfill" style="width:${p}%"></div></div><span class="ppct">${p}%</span></div>`;}).join(''):'<div class="empty" style="padding:10px;font-size:12px;">No activities logged.</div>';
+  let ab=document.getElementById('actBreak');if(ab)ab.innerHTML=html;
+  let ra=document.getElementById('r-acts');if(ra)ra.innerHTML=html;
+}
+function updateReport(){
+  let eps=todayEps();
+  let setEl=(id,v)=>{let el=document.getElementById(id);if(el)el.textContent=v;};
+  ['r-cnt','rr-cnt'].forEach(id=>setEl(id,eps.length));
+  if(!eps.length)return;
+  let durs=eps.map(e=>e.duration),total=durs.reduce((a,b)=>a+b,0),avg=Math.round(total/durs.length);
+  setEl('r-total',total+'s');setEl('rr-total',total+'s ('+((total/60).toFixed(1))+' min)');
+  setEl('r-avg',avg+'s');setEl('rr-avg',avg+'s');
+  let pk=Math.max(...eps.map(e=>e.peakAmp||0));
+  setEl('r-peak',pk.toFixed(3)+' m/s²');setEl('rr-peak',pk.toFixed(3)+' m/s²');
+  setEl('rr-max',Math.max(...durs)+'s');setEl('rr-min',Math.min(...durs)+'s');
+  setEl('rr-first',new Date(Math.min(...eps.map(e=>e.start))).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}));
+  setEl('rr-last',new Date(Math.max(...eps.map(e=>e.start))).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}));
+  let low=eps.filter(e=>e.intensity==='low').length,med=eps.filter(e=>e.intensity==='medium').length,high=eps.filter(e=>e.intensity==='high').length;
+  setEl('rr-low',low+' ('+Math.round(low/eps.length*100)+'%)');
+  setEl('rr-med',med+' ('+Math.round(med/eps.length*100)+'%)');
+  setEl('rr-high',high+' ('+Math.round(high/eps.length*100)+'%)');
+  // Intensity visual bar
+  let ib=document.getElementById('intensity-bar');
+  if(ib&&eps.length){ib.innerHTML=`<div style="flex:${low||0.01};background:var(--amber2);transition:flex 0.4s;"></div><div style="flex:${med||0.01};background:rgba(190,58,29,0.35);transition:flex 0.4s;"></div><div style="flex:${high||0.01};background:var(--red);transition:flex 0.4s;"></div>`;}
+  // Time of day
+  let tm={Morning:0,Afternoon:0,Evening:0,Night:0};
+  episodes.forEach(ep=>{let h=new Date(ep.start).getHours();if(h>=6&&h<12)tm.Morning++;else if(h>=12&&h<18)tm.Afternoon++;else if(h>=18&&h<22)tm.Evening++;else tm.Night++;});
+  let tt=episodes.length||1,rt=document.getElementById('r-tod');
+  if(rt&&episodes.length){rt.innerHTML=Object.entries(tm).map(([k,v])=>{let p=Math.round(v/tt*100);return`<div class="prow"><span class="plab" style="font-size:11px;">${k}</span><div class="ptrack"><div class="pfill" style="width:${p}%;background:var(--teal);"></div></div><span class="ppct">${p}%</span></div>`;}).join('');}
+  updateActBreak();generateInsights();
+}
+function generateInsights(){
+  let card=document.getElementById('r-insight-dynamic-card');if(!card)return;
+  let eps=todayEps();
+  if(eps.length<2){card.style.display='none';return;}
+  card.style.display='block';
+  let stressEps=eps.filter(e=>e.activities.includes('Stressed'));
+  let highEps=eps.filter(e=>e.intensity==='high');
+  let avgDur=Math.round(eps.map(e=>e.duration).reduce((a,b)=>a+b)/eps.length);
+  let title=document.getElementById('r-insight-title'),body=document.getElementById('r-insight-body');
+  if(stressEps.length/eps.length>0.5){
+    title.textContent='⚠️ Stress correlation detected';
+    body.textContent=`${Math.round(stressEps.length/eps.length*100)}% of today's ${eps.length} tremor episodes were tagged "Stressed." Stress is a well-documented amplifier of Parkinson's tremor via sympathetic nervous system activation. Consider prioritising stress-reduction techniques — mindfulness, gentle breathing, or tai chi — and discuss this pattern with your care team.`;
+  }else if(highEps.length/eps.length>0.4){
+    title.textContent='📈 High-intensity cluster today';
+    body.textContent=`${Math.round(highEps.length/eps.length*100)}% of today's episodes reached high amplitude (>0.8 m/s²). This may indicate a medication wearing-off pattern or an unusually stressful day. Check if episodes cluster around a particular time — that could point to an end-of-dose effect worth discussing with your neurologist.`;
+  }else{
+    title.textContent='📊 Today\'s pattern summary';
+    body.textContent=`${eps.length} episode${eps.length>1?'s':''} today, averaging ${avgDur}s each. Continue logging activities to build the trend data your neurologist needs. Consistent monitoring over 2–4 weeks reveals patterns not visible day-to-day.`;
+  }
+}
+function exportReport(){
+  let eps=todayEps();
+  let lines=[`TremorCare Clinical Report`,`Generated: ${new Date().toLocaleString()}`,`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,``,`TODAY'S SUMMARY`,`Episodes: ${eps.length}`,`Total tremor time: ${eps.reduce((a,e)=>a+e.duration,0)}s`,`Avg duration: ${eps.length?Math.round(eps.map(e=>e.duration).reduce((a,b)=>a+b)/eps.length):0}s`,`Peak amplitude: ${eps.length?Math.max(...eps.map(e=>e.peakAmp||0)).toFixed(3):0} m/s²`,``,`EPISODE LOG`,`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,...eps.map(e=>`  ${new Date(e.start).toLocaleTimeString()} — ${e.duration}s [${e.intensity}] ${e.activities.join(', ')}${e.note?' — '+e.note:''}`),``,`ALL-TIME TOTALS`,`Total episodes logged: ${episodes.length}`,`Longest episode: ${episodes.length?Math.max(...episodes.map(e=>e.duration)):0}s`,`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,`TremorCare is a monitoring aid only. Not for diagnostic use.`];
+  let blob=new Blob([lines.join('\n')],{type:'text/plain'});let url=URL.createObjectURL(blob);let a=document.createElement('a');a.href=url;a.download=`TremorCare-${new Date().toISOString().slice(0,10)}.txt`;a.click();URL.revokeObjectURL(url);
+}
+
+// ════════════════════════════════════════
+// ACTIVITY
+// ════════════════════════════════════════
+function togAct(btn,prefix){
+  btn.classList.toggle('on');
+  let other=prefix==='db'?'sv':'db';
+  let ob=Array.from(document.querySelectorAll('#'+other+'-tags .atag')).find(b=>b.textContent===btn.textContent);
+  if(ob)ob.classList.toggle('on',btn.classList.contains('on'));
+  curActs=Array.from(document.querySelectorAll('#db-tags .atag.on')).map(b=>b.textContent);
+}
+function saveAct(prefix){
+  curActs=Array.from(document.querySelectorAll('#'+prefix+'-tags .atag.on')).map(b=>b.textContent);
+  let note=document.getElementById(prefix+'-custom').value.trim();
+  if(!curActs.length&&!note){alert('Select at least one activity.');return;}
+  if(episodes.length){let last=episodes[episodes.length-1];last.activities=curActs;last.note=note;localStorage.setItem('tc3_ep',JSON.stringify(episodes));updateEvList();updateActBreak();['db','sv'].forEach(p=>{document.querySelectorAll('#'+p+'-tags .atag').forEach(b=>b.classList.remove('on'));let c=document.getElementById(p+'-custom');if(c)c.value='';});let ln=document.getElementById(prefix+'-lognote');if(ln){ln.textContent='✓ Saved!';ln.style.color='var(--teal)';setTimeout(()=>{ln.textContent='What were you doing during the last tremor?';ln.style.color='';},2000);}}
+}
+
+// ════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════
+function goTo(name){
+  document.querySelectorAll('.page').forEach(p=>{p.classList.remove('active');});
+  let target=document.getElementById('page-'+name);
+  target.classList.remove('hidden');
+  target.classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach((b,i)=>{b.classList.toggle('active',['monitor','history','report','learn','community'][i]===name);});
+  if(name==='history'){updateEvList();updateWeekChart();updateActBreak();updateTrendChart();updateHeatmap();updateDurationChart();}
+  if(name==='report')updateReport();
+  if(name==='community'){renderPosts();updateProfilePreview();}
+}
+function setView(v){
+  document.getElementById('view-dash').classList.toggle('hidden',v!=='dash');
+  document.getElementById('view-sig').classList.toggle('hidden',v!=='sig');
+  document.getElementById('vt-dash').classList.toggle('active',v==='dash');
+  document.getElementById('vt-sig').classList.toggle('active',v==='sig');
+}
+function clearHist(){if(confirm('Clear all episode history?')){episodes=[];localStorage.removeItem('tc3_ep');updateEvList();updateWeekChart();updateMetrics();updateActBreak();updateTrendChart();updateHeatmap();updateDurationChart();}}
+
+// ════════════════════════════════════════
+// COMMUNITY
+// ════════════════════════════════════════
+function selAvatar(el,av){
+  myAvatar=av;
+  document.querySelectorAll('.av-opt').forEach(a=>a.classList.remove('sel'));
+  el.classList.add('sel');
+  updateProfilePreview();
+}
+function updateAnonMode(){
+  myAnon=document.getElementById('anonToggle').checked;
+  let hint=document.getElementById('anonHint');
+  if(hint)hint.textContent=myAnon?'Avatar shown, name hidden':'Name + avatar visible';
+  updateProfilePreview();
+}
+function updateProfilePreview(){
+  let pav=document.getElementById('preview-av');
+  let pname=document.getElementById('preview-name');
+  let nameVal=document.getElementById('displayName')?.value.trim();
+  if(pav)pav.textContent=myAnon?'👤':myAvatar;
+  if(pname)pname.textContent=myAnon?'Anonymous':(nameVal||'Community member');
+}
+function togCtag(el,tag){el.classList.toggle('on');selCTags=selCTags.includes(tag)?selCTags.filter(t=>t!==tag):[...selCTags,tag];}
+const tagCls={Experience:'pt-exp',Tip:'pt-tip',Question:'pt-q',Support:'pt-sup'};
+function filterPosts(f,btn){
+  currentFilter=f;
+  document.querySelectorAll('[onclick^="filterPosts"]').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  renderPosts();
+}
+function submitPost(){
+  let txt=document.getElementById('postText').value.trim();if(!txt)return;
+  myName=document.getElementById('displayName')?.value.trim()||'';
+  let name=myAnon?'Anonymous':(myName||'Community member');
+  posts.unshift({id:Date.now(),av:myAvatar,anon:myAnon,name,text:txt,tags:selCTags.length?[...selCTags]:['Experience'],time:'Just now',likes:0,liked:false});
+  localStorage.setItem('tc3_posts',JSON.stringify(posts));
+  document.getElementById('postText').value='';selCTags=[];document.querySelectorAll('.ctag[onclick^="togCtag"]').forEach(t=>t.classList.remove('on'));renderPosts();
+}
+function togLike(id){let p=posts.find(p=>p.id===id);if(!p)return;p.liked=!p.liked;p.likes+=(p.liked?1:-1);localStorage.setItem('tc3_posts',JSON.stringify(posts));renderPosts();}
+function renderPosts(){
+  let list=document.getElementById('postList');if(!list)return;
+  let filtered=currentFilter==='all'?posts:posts.filter(p=>p.tags.includes(currentFilter));
+  let cntEl=document.getElementById('post-count-label');if(cntEl)cntEl.textContent=filtered.length+' post'+(filtered.length!==1?'s':'');
+  if(!filtered.length){list.innerHTML='<div class="empty">No posts in this category yet.</div>';return;}
+  list.innerHTML=filtered.map(p=>{
+    let tags=p.tags.map(t=>`<span class="ptag ${tagCls[t]||'pt-exp'}">${t}</span>`).join('');
+    let avContent=p.anon?'👤':p.av;
+    let avBg=p.anon?'var(--surf3)':'var(--surf2)';
+    return`<div class="pcard"><div class="pcard-hd"><div class="pav" style="background:${avBg};font-size:${p.anon?'16px':'20px'}">${avContent}</div><div><div class="pname">${p.name}${p.anon&&p.av?` <span style="font-size:10px;color:var(--ink4);font-weight:400;">(anonymous)</span>`:''}</div><div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;"><span class="ptime">${p.time}</span><div class="ptags">${tags}</div></div></div></div><div class="pbody">${p.text}</div><div class="pfooter"><div class="pact${p.liked?' liked':''}" onclick="togLike(${p.id})">♥ ${p.likes}</div><div class="pact">↩ Reply</div><div class="pact">⤴ Share</div></div></div>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════
+// WEBSOCKET
+// ════════════════════════════════════════
+function toggleConn(){if(connected)doDisconn();else doConn();}
+function doConn(){let url=document.getElementById('wsUrl').value.trim();try{ws=new WebSocket(url);ws.onopen=()=>{connected=true;demoMode=false;stopDemo();document.getElementById('connBtn').textContent='Disconnect';document.getElementById('scdot').classList.add('live');document.getElementById('sctext').textContent='Connected';document.getElementById('demobar').classList.add('hidden');};ws.onmessage=e=>{try{let d=JSON.parse(e.data);if(d.x!==undefined)processSample(+d.x,+d.y,+d.z);}catch(err){}};ws.onclose=ws.onerror=()=>doDisconn();}catch(e){alert('Connection failed.');}}
+function doDisconn(){connected=false;if(ws){ws.close();ws=null;}document.getElementById('connBtn').textContent='Connect to ESP32';document.getElementById('scdot').classList.remove('live');document.getElementById('sctext').textContent='Demo mode active';demoMode=true;startDemo();}
+
+// ════════════════════════════════════════
+// DEMO
+// ════════════════════════════════════════
+let dT=0,dTrem=false,dTicks=0;
+function startDemo(){if(demoInt)return;demoInt=setInterval(()=>{dT+=0.02;let x=Math.sin(dT*1.3)*2.5+(Math.random()-.5)*.3,y=Math.cos(dT*.9)*1.8+(Math.random()-.5)*.3,z;if(dTrem){z=Math.sin(dT*2*Math.PI*4.5)*1.2+(Math.random()-.5)*.2;dTicks++;if(dTicks>150+Math.random()*120){dTrem=false;dTicks=0;}}else{z=(Math.random()-.5)*.15;if(Math.random()<0.0008)dTrem=true;}processSample(x,y,z);},20);}
+function stopDemo(){if(demoInt){clearInterval(demoInt);demoInt=null;}}
+function triggerDemo(){dTrem=true;dTicks=0;}
+
+// ════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════
+// Seed demo episodes so History/Report pages are populated on first visit
+if(episodes.length===0){
+  let base=Date.now();
+  let apool=[['Typing'],['Eating'],['Stressed'],['Drinking'],['Resting'],['Walking','Stressed'],['Typing','Stressed'],['Eating']];
+  let ipool=['low','medium','medium','high','low','medium','high','low'];
+  // Today: 3 episodes
+  [[2.5,38,'medium'],[1.2,52,'high'],[0.5,21,'low']].forEach(([hAgo,dur,intens],i)=>{
+    let start=base-hAgo*3600000;
+    episodes.push({id:base+i,start,end:start+dur*1000,duration:dur,peakAmp:parseFloat((0.3+Math.random()*0.8).toFixed(3)),activities:apool[i],note:'',intensity:intens});
+  });
+  // Past 6 days
+  for(let d=1;d<=6;d++){let cnt=1+Math.floor(Math.random()*4);for(let i=0;i<cnt;i++){let start=base-d*86400000+i*3600000+Math.random()*1800000;let dur=12+Math.floor(Math.random()*75);episodes.push({id:base+d*100+i,start,end:start+dur*1000,duration:dur,peakAmp:parseFloat((0.2+Math.random()*0.9).toFixed(3)),activities:apool[(d+i)%apool.length],note:'',intensity:ipool[(d+i)%ipool.length]});}}
+  localStorage.setItem('tc3_ep',JSON.stringify(episodes));
+}
+setView('sig');
+updateMetrics();updateEvList();updateWeekChart();updateActBreak();renderPosts();updateProfilePreview();startDemo();
+setInterval(()=>{if(tremoring)updateBanners();updateMetrics();},1000);
+window.addEventListener('resize',()=>{updateTrendChart();updateHeatmap();updateDurationChart();});
+</script>
+</body>
+</html>

@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>TremorCare</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#18181b; --ink2:#52525b; --ink3:#71717a; --ink4:#a1a1aa;
+  --bg:#f8f7f4; --card:#ffffff; --border:#e4e2dd; --border2:#f0ede8;
+  --red:#c4622d; --red2:#fae8df; --red3:rgba(196,98,45,0.10);
+  --teal:#0d7a6e; --teal2:#ccf2ee; --teal3:rgba(13,122,110,0.09);
+  --blue:#1d4ed8; --blue2:#dbeafe;
+  --amber:#b45309; --amber2:#fef3c7;
+  --violet:#6d28d9; --violet2:#ede9fe;
+  --green:#16a34a; --green2:#dcfce7;
+  --r:14px; --rsm:9px;
+  --sh:0 1px 3px rgba(0,0,0,0.05),0 4px 12px rgba(0,0,0,0.06);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;background:#000;}
+button,input,textarea,select{font-family:inherit;}
+
+/* ── PHONE SHELL (desktop) ── */
+.shell{
+  width:100%; height:100%;
+  display:flex; align-items:center; justify-content:center;
+  background:linear-gradient(135deg,#0f0f13 0%,#1a1015 50%,#0f1218 100%);
+}
+.shell::before{
+  content:'TremorCare — Mobile App Demo';
+  position:fixed; top:20px; left:50%; transform:translateX(-50%);
+  font-size:12px; letter-spacing:0.12em; text-transform:uppercase;
+  color:rgba(255,255,255,0.2); font-family:'DM Sans',sans-serif;
+  pointer-events:none;
+}
+
+.phone{
+  width:393px; height:852px;
+  background:var(--bg);
+  border-radius:50px;
+  overflow:hidden;
+  position:relative;
+  box-shadow:
+    0 0 0 10px #1c1c1e,
+    0 0 0 11px #3a3a3c,
+    0 40px 80px rgba(0,0,0,0.8),
+    0 0 0 12px #1c1c1e;
+  display:flex; flex-direction:column;
+}
+/* Side buttons */
+.phone::before{
+  content:'';
+  position:absolute; right:-12px; top:160px;
+  width:4px; height:70px;
+  background:#1c1c1e; border-radius:0 3px 3px 0;
+}
+.phone::after{
+  content:'';
+  position:absolute; left:-12px; top:130px;
+  width:4px; height:34px;
+  background:#1c1c1e; border-radius:3px 0 0 3px;
+  box-shadow:0 46px 0 #1c1c1e, 0 90px 0 #1c1c1e;
+}
+
+/* On real mobile — fill screen */
+@media (max-width:430px){
+  .shell{background:var(--bg);}
+  .shell::before{display:none;}
+  .phone{
+    width:100%; height:100%;
+    border-radius:0;
+    box-shadow:none;
+  }
+  .phone::before,.phone::after{display:none;}
+}
+
+/* ── STATUS BAR ── */
+.statusbar{
+  height:54px; flex-shrink:0;
+  display:flex; align-items:flex-end; justify-content:space-between;
+  padding:0 28px 10px;
+  background:var(--bg);
+  position:relative; z-index:10;
+}
+.sb-time{font-size:15px;font-weight:600;color:var(--ink);letter-spacing:-0.2px;}
+.sb-icons{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--ink);}
+
+/* Dynamic Island */
+.di{
+  position:absolute; top:12px; left:50%; transform:translateX(-50%);
+  width:126px; height:36px;
+  background:#000; border-radius:20px;
+  z-index:20;
+}
+
+/* ── CONNECTION BAR ── */
+.connbar{
+  background:var(--ink); padding:7px 18px;
+  display:flex; align-items:center; justify-content:space-between;
+  flex-shrink:0;
+}
+.conn-left{display:flex;align-items:center;gap:7px;}
+.cdot{
+  width:7px;height:7px;border-radius:50%;
+  background:rgba(255,255,255,0.2); flex-shrink:0; transition:background 0.3s;
+}
+.cdot.live{background:#22c55e;box-shadow:0 0 0 3px rgba(34,197,94,0.25);animation:glow 2s infinite;}
+@keyframes glow{0%,100%{box-shadow:0 0 0 3px rgba(34,197,94,0.2)}50%{box-shadow:0 0 0 5px rgba(34,197,94,0.07)}}
+.conn-text{font-size:11px;color:rgba(255,255,255,0.5);}
+.conn-btn{
+  font-size:11px; padding:4px 11px;
+  border:0.5px solid rgba(255,255,255,0.2); border-radius:6px;
+  background:transparent; color:rgba(255,255,255,0.7);
+  cursor:pointer; transition:all 0.15s;
+}
+.conn-btn:hover,.conn-btn:active{background:rgba(255,255,255,0.1);color:#fff;}
+.conn-btn.connected{border-color:rgba(34,197,94,0.4);color:#4ade80;}
+
+/* ── APP BODY ── */
+.app{flex:1;overflow:hidden;display:flex;flex-direction:column;background:var(--bg);}
+
+/* ── SCREENS ── */
+.screen{display:none;flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;}
+.screen::-webkit-scrollbar{display:none;}
+.screen.active{display:block;}
+
+/* ── BOTTOM NAV ── */
+.bottomnav{
+  height:calc(60px + var(--safe-bottom));
+  padding-bottom:var(--safe-bottom);
+  background:rgba(255,255,255,0.95);
+  backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+  border-top:0.5px solid var(--border);
+  display:flex; align-items:flex-start; padding-top:6px;
+  flex-shrink:0; position:relative; z-index:10;
+}
+.ntab{
+  flex:1; display:flex; flex-direction:column; align-items:center; gap:3px;
+  cursor:pointer; padding:4px 0; border:none; background:none;
+}
+.ntab-icon{
+  width:28px;height:28px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px; transition:all 0.18s;
+}
+.ntab.active .ntab-icon{background:var(--ink);}
+.ntab-label{font-size:9px;font-weight:500;color:var(--ink4);letter-spacing:0.02em;}
+.ntab.active .ntab-label{color:var(--ink);}
+.ntab-icon svg{width:15px;height:15px;fill:none;stroke:var(--ink4);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.ntab.active .ntab-icon svg{stroke:#fff;}
+
+/* ── PAGE HEADER ── */
+.ph{padding:16px 18px 12px;background:var(--card);border-bottom:0.5px solid var(--border2);position:sticky;top:0;z-index:9;}
+.ph-eye{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--ink4);margin-bottom:3px;}
+.ph-title{font-family:'Fraunces',serif;font-size:22px;font-weight:400;letter-spacing:-0.3px;}
+.ph-title em{color:var(--red);font-style:italic;}
+.ph-sub{font-size:11px;color:var(--ink3);margin-top:2px;}
+
+.pad{padding:14px 16px;}
+
+/* ── CARDS ── */
+.card{background:var(--card);border:0.5px solid var(--border);border-radius:var(--r);box-shadow:var(--sh);}
+.cp{padding:14px 16px;}
+.ch{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink4);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;}
+.mb10{margin-bottom:10px;}
+.mb14{margin-bottom:14px;}
+
+/* ── GRID ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:9px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:9px;}
+
+/* ── STAT ── */
+.sc{background:var(--card);border:0.5px solid var(--border);border-radius:var(--r);padding:12px 13px;box-shadow:var(--sh);}
+.sc-l{font-size:10px;color:var(--ink3);margin-bottom:3px;}
+.sc-v{font-family:'DM Mono',monospace;font-size:20px;font-weight:500;color:var(--ink);}
+.sc-u{font-size:10px;color:var(--ink4);margin-top:1px;}
+.sc-s{font-size:10px;color:var(--ink3);margin-top:2px;}
+.sc-teal{background:var(--teal2);border-color:#99e6df;}
+.sc-amber{background:var(--amber2);border-color:#fde68a;}
+.sc-violet{background:var(--violet2);border-color:#c4b5fd;}
+
+/* ── STATUS BANNER ── */
+.sbanner{border-radius:var(--r);padding:16px 18px;display:flex;align-items:center;justify-content:space-between;border:0.5px solid;margin-bottom:10px;transition:all 0.4s;position:relative;overflow:hidden;}
+.sbanner::after{content:'';position:absolute;right:-20px;top:-20px;width:80px;height:80px;border-radius:50%;background:currentColor;opacity:0.07;}
+.bn{background:var(--teal3);border-color:var(--teal2);color:var(--teal);}
+.bt{background:var(--red3);border-color:var(--red2);color:var(--red);}
+.bs-st{font-family:'Fraunces',serif;font-size:24px;letter-spacing:-0.3px;}
+.bs-dt{font-size:11px;opacity:0.65;margin-top:2px;}
+.bs-n{font-family:'DM Mono',monospace;font-size:20px;font-weight:500;text-align:right;}
+.bs-nl{font-size:9px;opacity:0.55;text-align:right;text-transform:uppercase;letter-spacing:0.06em;margin-top:2px;}
+
+/* ── VIEW TOGGLE ── */
+.vtog{display:flex;background:var(--border2);border:0.5px solid var(--border);border-radius:10px;padding:3px;margin-bottom:12px;gap:2px;}
+.vbtn{flex:1;padding:6px 4px;font-size:11px;font-weight:500;border-radius:7px;cursor:pointer;border:none;background:transparent;color:var(--ink3);transition:all 0.13s;font-family:'DM Sans',sans-serif;}
+.vbtn.active{background:var(--ink);color:#fff;}
+
+/* ── CHARTS ── */
+canvas{display:block;width:100%;}
+.alabel{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--ink4);margin:8px 0 2px;display:flex;align-items:center;gap:4px;}
+.adot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.frow{display:flex;align-items:center;gap:6px;}
+.ftrack{flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden;max-width:60px;}
+.ffill{height:100%;background:var(--red);border-radius:2px;transition:width 0.1s;}
+.rmono{font-family:'DM Mono',monospace;font-size:10px;color:var(--ink3);}
+
+/* ── ACTIVITY ── */
+.atags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;}
+.atag{padding:5px 11px;border:0.5px solid var(--border);border-radius:99px;font-size:12px;cursor:pointer;background:var(--border2);color:var(--ink2);transition:all 0.12s;font-family:'DM Sans',sans-serif;}
+.atag.on{background:var(--red3);color:var(--red);border-color:var(--red2);font-weight:500;}
+.arow{display:flex;gap:6px;margin-top:4px;}
+.ainp{flex:1;border:0.5px solid var(--border);border-radius:var(--rsm);padding:8px 10px;font-size:12px;background:var(--border2);color:var(--ink);font-family:'DM Sans',sans-serif;}
+.ainp:focus{outline:none;border-color:var(--red2);}
+.abtn{padding:8px 14px;background:var(--ink);color:#fff;border:none;border-radius:var(--rsm);font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;}
+
+/* ── EPISODE LIST ── */
+.evlist{max-height:220px;overflow-y:auto;}
+.evlist::-webkit-scrollbar{display:none;}
+.evitem{display:flex;align-items:flex-start;gap:9px;padding:9px 0;border-bottom:0.5px solid var(--border2);}
+.evitem:last-child{border-bottom:none;}
+.evpip{width:6px;height:6px;border-radius:50%;margin-top:4px;flex-shrink:0;background:var(--red);}
+.evbody{flex:1;min-width:0;}
+.evtit{font-size:12px;font-weight:500;}
+.evmeta{font-size:10px;color:var(--ink3);margin-top:1px;}
+.evtime{font-size:10px;color:var(--ink4);font-family:'DM Mono',monospace;white-space:nowrap;}
+.ibadge{display:inline-block;padding:1px 5px;border-radius:3px;font-size:9px;font-weight:600;margin-left:3px;text-transform:uppercase;}
+.ilow{background:var(--amber2);color:var(--amber);}
+.imed{background:var(--red2);color:var(--red);}
+.ihigh{background:#fde8e8;color:#991b1b;}
+.apill{display:inline-block;background:var(--blue2);color:var(--blue);font-size:9px;padding:2px 6px;border-radius:3px;margin:2px 2px 0 0;font-weight:500;}
+
+/* ── WEEK BARS ── */
+.wbars{display:flex;align-items:flex-end;gap:4px;height:60px;}
+.wbcol{flex:1;display:flex;flex-direction:column;align-items:center;height:100%;}
+.wbspc{flex:1;display:flex;align-items:flex-end;width:100%;}
+.wbbar{width:100%;border-radius:3px 3px 0 0;min-height:2px;background:var(--border);transition:height 0.3s;}
+.wbbar.today{background:var(--red);}
+.wbday{font-size:9px;color:var(--ink4);margin-top:3px;}
+.wbcnt{font-size:9px;color:var(--ink3);font-weight:600;margin-bottom:1px;min-height:12px;}
+
+/* ── TREND TABS ── */
+.ttabs{display:flex;gap:2px;margin-bottom:10px;background:var(--border2);border:0.5px solid var(--border);border-radius:8px;padding:2px;}
+.ttab{flex:1;text-align:center;padding:5px 2px;font-size:11px;font-weight:500;color:var(--ink3);cursor:pointer;border-radius:6px;border:none;background:none;transition:all 0.13s;font-family:'DM Sans',sans-serif;}
+.ttab.active{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,0.08);}
+
+/* ── PIE ROWS ── */
+.prow{display:flex;align-items:center;gap:7px;padding:4px 0;}
+.plab{font-size:11px;color:var(--ink2);min-width:70px;}
+.ptrack{flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden;}
+.pfill{height:100%;border-radius:2px;background:var(--red);}
+.ppct{font-size:10px;color:var(--ink3);min-width:28px;text-align:right;font-family:'DM Mono',monospace;}
+
+/* ── REPORT ── */
+.rrow{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:0.5px solid var(--border2);font-size:12px;}
+.rrow:last-child{border-bottom:none;}
+.rval{font-family:'DM Mono',monospace;font-weight:500;}
+.rhead{font-family:'Fraunces',serif;font-size:15px;margin-bottom:10px;}
+.icard{border-radius:10px;padding:11px 13px;margin-bottom:8px;border-left:3px solid;}
+.ic-blue{background:var(--blue2);border-color:var(--blue);}
+.ic-teal{background:var(--teal2);border-color:var(--teal);}
+.ic-amber{background:var(--amber2);border-color:var(--amber);}
+.ic-violet{background:var(--violet2);border-color:var(--violet);}
+.ic-red{background:var(--red2);border-color:var(--red);}
+.itit{font-size:11px;font-weight:600;margin-bottom:3px;}
+.ibody{font-size:11px;line-height:1.6;color:var(--ink2);}
+
+/* ── LEARN ── */
+.lhero{background:var(--ink);border-radius:var(--r);padding:18px;margin-bottom:12px;position:relative;overflow:hidden;}
+.lhero::before{content:'';position:absolute;right:-30px;bottom:-30px;width:110px;height:110px;border-radius:50%;background:var(--red);opacity:0.1;}
+.lht{font-family:'Fraunces',serif;font-size:19px;color:#fff;margin-bottom:5px;position:relative;z-index:1;}
+.lhs{font-size:11px;color:rgba(255,255,255,0.45);line-height:1.7;position:relative;z-index:1;}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:0.5px;background:var(--border);border:0.5px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:12px;}
+.fact{background:var(--card);padding:12px 13px;}
+.fact-n{font-family:'Fraunces',serif;font-size:21px;color:var(--red);}
+.fact-d{font-size:10px;color:var(--ink3);margin-top:2px;line-height:1.4;}
+.lcard{background:var(--card);border:0.5px solid var(--border);border-radius:var(--r);padding:14px 15px;box-shadow:var(--sh);margin-bottom:10px;}
+.ltag{display:inline-block;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.09em;padding:2px 7px;border-radius:3px;margin-bottom:7px;}
+.lt-blue{background:var(--blue2);color:var(--blue);}
+.lt-teal{background:var(--teal2);color:var(--teal);}
+.lt-red{background:var(--red2);color:var(--red);}
+.lt-amber{background:var(--amber2);color:var(--amber);}
+.lt-violet{background:var(--violet2);color:var(--violet);}
+.lcard h3{font-family:'Fraunces',serif;font-size:15px;margin-bottom:6px;}
+.lcard p,.lcard li{font-size:12px;color:var(--ink2);line-height:1.65;}
+.lcard ul{padding-left:14px;margin-top:5px;}
+.lcard li{margin-bottom:3px;}
+.rc{display:flex;gap:11px;padding:11px 0;border-bottom:0.5px solid var(--border2);}
+.rc:last-child{border-bottom:none;padding-bottom:0;}
+.rc-yr{font-family:'DM Mono',monospace;font-size:10px;color:var(--ink4);white-space:nowrap;min-width:30px;}
+.rc h4{font-size:12px;font-weight:600;margin-bottom:3px;}
+.rc p{font-size:11px;color:var(--ink2);line-height:1.6;}
+.rc-j{font-size:10px;color:var(--ink4);margin-top:4px;font-style:italic;}
+.anote{background:var(--red3);color:var(--red);padding:9px 12px;border-radius:var(--rsm);font-size:11px;border-left:2px solid var(--red);margin-top:10px;line-height:1.6;}
+
+/* ── COMMUNITY ── */
+.prof{background:var(--card);border:0.5px solid var(--border);border-radius:var(--r);padding:14px 15px;box-shadow:var(--sh);margin-bottom:12px;}
+.prof-t{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.09em;color:var(--ink3);margin-bottom:10px;}
+.av-row{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px;}
+.av{width:42px;height:42px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:21px;border:2px solid transparent;transition:all 0.15s;background:var(--border2);}
+.av:active{transform:scale(0.95);}
+.av.sel{border-color:var(--red);box-shadow:0 0 0 3px var(--red3);}
+.anon-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px;}
+.tog-wrap{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--ink2);cursor:pointer;}
+.tog-inp{position:absolute;opacity:0;width:0;height:0;}
+.tog-track{width:34px;height:19px;background:var(--border);border-radius:10px;transition:background 0.2s;position:relative;flex-shrink:0;}
+.tog-inp:checked+.tog-track{background:var(--teal);}
+.tog-track::after{content:'';position:absolute;width:15px;height:15px;border-radius:50%;background:#fff;top:2px;left:2px;transition:transform 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.15);}
+.tog-inp:checked+.tog-track::after{transform:translateX(15px);}
+.ninp{border:0.5px solid var(--border);border-radius:var(--rsm);padding:7px 10px;font-size:12px;background:var(--border2);color:var(--ink);width:150px;font-family:'DM Sans',sans-serif;}
+.ninp:focus{outline:none;border-color:var(--red2);}
+.prev-box{margin-top:9px;padding:8px 11px;background:var(--border2);border-radius:8px;display:flex;align-items:center;gap:8px;border:0.5px solid var(--border);}
+.compose{background:var(--card);border:0.5px solid var(--border);border-radius:var(--r);padding:13px 15px;box-shadow:var(--sh);margin-bottom:12px;}
+.compose-l{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.09em;color:var(--ink4);margin-bottom:8px;}
+.compose-a{width:100%;border:0.5px solid var(--border);border-radius:var(--rsm);padding:9px 11px;font-size:12px;font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--border2);resize:none;line-height:1.6;}
+.compose-a:focus{outline:none;border-color:var(--red2);}
+.compose-ft{display:flex;align-items:flex-end;justify-content:space-between;margin-top:8px;gap:8px;}
+.ctags{display:flex;gap:4px;flex-wrap:wrap;}
+.ctag{padding:4px 9px;border-radius:99px;font-size:10px;cursor:pointer;border:0.5px solid var(--border);background:var(--border2);color:var(--ink3);transition:all 0.12s;font-family:'DM Sans',sans-serif;}
+.ctag.on{background:var(--red3);color:var(--red);border-color:var(--red2);}
+.postbtn{padding:8px 16px;background:var(--ink);color:#fff;border:none;border-radius:var(--rsm);font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;}
+.filt-row{display:flex;gap:5px;margin-bottom:10px;overflow-x:auto;padding-bottom:2px;}
+.filt-row::-webkit-scrollbar{display:none;}
+.pcard{background:var(--card);border:0.5px solid var(--border);border-radius:var(--r);padding:13px 15px;margin-bottom:9px;box-shadow:var(--sh);}
+.pcard-hd{display:flex;align-items:center;gap:9px;margin-bottom:8px;}
+.pav2{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;background:var(--border2);}
+.pname{font-size:12px;font-weight:600;}
+.ptime{font-size:10px;color:var(--ink4);}
+.ptags{display:flex;gap:4px;flex-wrap:wrap;margin-top:2px;}
+.ptag{font-size:9px;padding:1px 6px;border-radius:3px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;}
+.pt-e{background:var(--blue2);color:var(--blue);}
+.pt-t{background:var(--teal2);color:var(--teal);}
+.pt-q{background:var(--amber2);color:var(--amber);}
+.pt-s{background:var(--violet2);color:var(--violet);}
+.pbody{font-size:12px;color:var(--ink2);line-height:1.7;}
+.pfooter{display:flex;gap:12px;margin-top:9px;padding-top:8px;border-top:0.5px solid var(--border2);}
+.pact{font-size:11px;color:var(--ink4);cursor:pointer;transition:color 0.12s;}
+.pact:hover,.pact.liked{color:var(--red);}
+
+/* ── DEMO BAR ── */
+.demobar{background:var(--amber2);border:0.5px solid #fde68a;border-radius:var(--rsm);padding:8px 12px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--amber);}
+.dbtn{font-size:10px;padding:3px 9px;border:0.5px solid #fde68a;border-radius:var(--rsm);background:#fff;color:var(--amber);cursor:pointer;margin-left:5px;font-family:'DM Sans',sans-serif;}
+
+.divider{height:0.5px;background:var(--border2);margin:12px 0;}
+.empty{text-align:center;padding:24px 16px;color:var(--ink4);font-size:12px;}
+.hidden{display:none!important;}
+
+/* ── CONNECT MODAL ── */
+.modal-overlay{
+  position:absolute;top:0;left:0;right:0;bottom:0;
+  background:rgba(0,0,0,0.55);
+  z-index:100;
+  display:flex;align-items:flex-end;justify-content:center;
+  backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+}
+.modal-sheet{
+  background:#fff;
+  border-radius:24px 24px 0 0;
+  padding:20px 20px calc(20px + var(--safe-bottom));
+  width:100%;
+  max-height:90%;
+  overflow-y:auto;
+  animation:slideup 0.25s ease-out;
+}
+@keyframes slideup{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 18px;}
+.modal-title{font-family:'Fraunces',serif;font-size:20px;margin-bottom:4px;}
+.modal-sub{font-size:12px;color:var(--ink3);margin-bottom:18px;line-height:1.5;}
+.modal-label{font-size:11px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px;}
+.modal-input{
+  width:100%;border:1.5px solid var(--border);border-radius:10px;
+  padding:12px 14px;font-size:15px;font-family:'DM Mono',monospace;
+  background:var(--border2);color:var(--ink);margin-bottom:5px;
+  -webkit-appearance:none;
+}
+.modal-input:focus{outline:none;border-color:var(--red);}
+.modal-hint{font-size:11px;color:var(--ink4);margin-bottom:16px;}
+.modal-err{background:var(--red2);color:var(--red);border-radius:8px;padding:10px 13px;font-size:11px;margin-bottom:14px;line-height:1.55;display:none;}
+.modal-connect{
+  width:100%;padding:14px;background:var(--ink);color:#fff;border:none;
+  border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;
+  font-family:'DM Sans',sans-serif;margin-bottom:9px;
+  -webkit-appearance:none;transition:background 0.15s;
+}
+.modal-connect:active{background:var(--red);}
+.modal-cancel{
+  width:100%;padding:12px;background:var(--border2);color:var(--ink2);border:none;
+  border-radius:12px;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif;
+  -webkit-appearance:none;
+}
+.checklist{margin-top:16px;padding-top:16px;border-top:0.5px solid var(--border);}
+.checklist-t{font-size:10px;font-weight:600;color:var(--ink4);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;}
+.checklist li{font-size:12px;color:var(--ink2);line-height:1.85;list-style:none;display:flex;align-items:flex-start;gap:7px;}
+.checklist li::before{content:'✓';color:var(--teal);font-weight:600;flex-shrink:0;}
+code{background:var(--border2);padding:1px 5px;border-radius:4px;font-family:'DM Mono',monospace;font-size:11px;}
+</style>
+</head>
+<body>
+<div class="shell">
+<div class="phone">
+
+  <!-- Dynamic Island -->
+  <div class="di"></div>
+
+  <!-- Status Bar -->
+  <div class="statusbar">
+    <span class="sb-time" id="clock">9:41</span>
+    <div class="sb-icons">
+      <svg width="16" height="12" viewBox="0 0 16 12"><rect x="0" y="3" width="3" height="9" rx="1" fill="currentColor" opacity="0.4"/><rect x="4.5" y="2" width="3" height="10" rx="1" fill="currentColor" opacity="0.6"/><rect x="9" y="0" width="3" height="12" rx="1" fill="currentColor" opacity="0.8"/><rect x="13.5" y="0" width="2.5" height="12" rx="1" fill="currentColor"/></svg>
+      <svg width="15" height="12" viewBox="0 0 15 12"><path d="M7.5 2.5C9.8 2.5 11.9 3.5 13.3 5.1L14.5 3.7C12.7 1.8 10.2 0.5 7.5 0.5 4.8 0.5 2.3 1.8 0.5 3.7L1.7 5.1C3.1 3.5 5.2 2.5 7.5 2.5z" fill="currentColor" opacity="0.5"/><path d="M7.5 5.5C9 5.5 10.3 6.1 11.2 7.1L12.4 5.7C11.1 4.4 9.4 3.5 7.5 3.5 5.6 3.5 3.9 4.4 2.6 5.7L3.8 7.1C4.7 6.1 6 5.5 7.5 5.5z" fill="currentColor" opacity="0.75"/><circle cx="7.5" cy="10" r="2" fill="currentColor"/></svg>
+      <svg width="25" height="12" viewBox="0 0 25 12"><rect x="0" y="1" width="21" height="10" rx="2.5" stroke="currentColor" stroke-width="1" fill="none" opacity="0.35"/><rect x="21.5" y="3.5" width="2" height="5" rx="1" fill="currentColor" opacity="0.4"/><rect x="1.5" y="2.5" width="15" height="7" rx="1.5" fill="currentColor"/></svg>
+    </div>
+  </div>
+
+  <!-- Connection Bar -->
+  <div class="connbar">
+    <div class="conn-left">
+      <div class="cdot" id="cdot"></div>
+      <span class="conn-text" id="ctext">Demo mode</span>
+    </div>
+    <button class="conn-btn" id="connBtn" onclick="openModal()">⚡ Connect ESP32</button>
+  </div>
+
+  <!-- App -->
+  <div class="app">
+
+    <!-- ══════ MONITOR ══════ -->
+    <div class="screen active" id="sc-monitor">
+      <div class="ph">
+        <div class="ph-eye">Real-time</div>
+        <div class="ph-title">Hand <em>Monitor</em></div>
+        <div class="ph-sub" id="ph-sub-mon">MPU-6050 · 100 Hz · 3–6 Hz bandpass on ESP32</div>
+      </div>
+      <div class="pad">
+
+        <div class="demobar" id="demobar">
+          <span><b>Demo</b> — synthetic tremor data</span>
+          <div>
+            <button class="dbtn" onclick="triggerDemo()">Tremor now</button>
+            <button class="dbtn" onclick="document.getElementById('demobar').classList.add('hidden')">✕</button>
+          </div>
+        </div>
+
+        <div class="vtog">
+          <button class="vbtn" id="vt-d" onclick="setView('d')">⊟ Dashboard</button>
+          <button class="vbtn active" id="vt-s" onclick="setView('s')">⊞ Signal</button>
+        </div>
+
+        <!-- DASHBOARD -->
+        <div id="vd" class="hidden">
+          <div class="sbanner bn" id="db-ban">
+            <div><div class="bs-st" id="db-st">Normal</div><div class="bs-dt" id="db-dt">No tremor detected</div></div>
+            <div><div class="bs-n" id="db-rms">0.000</div><div class="bs-nl">Z RMS</div></div>
+          </div>
+          <div class="g2">
+            <div class="sc"><div class="sc-l">Episodes today</div><div class="sc-v" id="db-cnt">0</div><div class="sc-u">tremors</div></div>
+            <div class="sc"><div class="sc-l">Avg duration</div><div class="sc-v" id="db-avg">—</div><div class="sc-u">seconds</div></div>
+            <div class="sc sc-amber"><div class="sc-l">Last tremor</div><div class="sc-v" id="db-last">—</div><div class="sc-s" id="db-ago"></div></div>
+            <div class="sc sc-teal"><div class="sc-l">Normal today</div><div class="sc-v" id="db-norm">—</div></div>
+          </div>
+          <div class="card cp mb14">
+            <div class="ch"><span id="db-logtit">Log last episode</span><span id="db-logtim" style="font-family:'DM Mono';font-size:11px;color:var(--red)"></span></div>
+            <div style="font-size:11px;color:var(--ink3);margin-bottom:8px">What were you doing?</div>
+            <div class="atags" id="db-tags">
+              <button class="atag" onclick="togAct(this,'db')">Typing</button>
+              <button class="atag" onclick="togAct(this,'db')">Eating</button>
+              <button class="atag" onclick="togAct(this,'db')">Drinking</button>
+              <button class="atag" onclick="togAct(this,'db')">Walking</button>
+              <button class="atag" onclick="togAct(this,'db')">Resting</button>
+              <button class="atag" onclick="togAct(this,'db')">Stressed</button>
+              <button class="atag" onclick="togAct(this,'db')">Exercising</button>
+            </div>
+            <div class="arow"><input class="ainp" id="db-cus" placeholder="Custom note..."><button class="abtn" onclick="saveAct('db')">Save</button></div>
+          </div>
+        </div>
+
+        <!-- SIGNAL -->
+        <div id="vs">
+          <div class="sbanner bn" id="sv-ban">
+            <div><div class="bs-st" id="sv-st">Normal</div><div class="bs-dt" id="sv-dt">No tremor detected</div></div>
+            <div><div class="bs-n" id="sv-rms">0.000</div><div class="bs-nl">Z RMS m/s²</div></div>
+          </div>
+          <div class="g2">
+            <div class="sc"><div class="sc-l">Episodes today</div><div class="sc-v" id="sv-cnt">0</div></div>
+            <div class="sc"><div class="sc-l">Peak amplitude</div><div class="sc-v" id="sv-peak">—</div><div class="sc-u">m/s²</div></div>
+          </div>
+          <div class="card cp mb10">
+            <div class="ch"><span>X &amp; Y Axes</span><span id="hzdisp" style="font-family:'DM Mono';font-size:9px;color:var(--ink4)">100 Hz</span></div>
+            <div class="alabel"><span class="adot" style="background:#1d4ed8"></span>X axis</div>
+            <canvas id="cX" height="44"></canvas>
+            <div class="alabel"><span class="adot" style="background:#0d7a6e"></span>Y axis</div>
+            <canvas id="cY" height="44"></canvas>
+          </div>
+          <div class="card cp mb14">
+            <div class="ch"><span>Z — Tremor Band 3–6 Hz</span>
+              <div class="frow"><div class="ftrack"><div class="ffill" id="ffill" style="width:0%"></div></div><span class="rmono" id="rmsdisp">0.000</span></div>
+            </div>
+            <div class="alabel"><span class="adot" style="background:var(--ink4)"></span>Raw Z</div>
+            <canvas id="cZ" height="44"></canvas>
+            <div class="alabel"><span class="adot" style="background:var(--red)"></span>Filtered (from ESP32)</div>
+            <canvas id="cZf" height="44"></canvas>
+            <div style="margin-top:6px;display:flex;justify-content:space-between;font-size:10px;color:var(--ink4)">
+              <span>Threshold: <b style="font-family:'DM Mono'">0.03</b> g</span>
+              <span>Window: <b>0.8s</b></span>
+            </div>
+          </div>
+          <div class="card cp mb14">
+            <div class="ch"><span id="sv-logtit">Log activity</span><span id="sv-logtim" style="font-family:'DM Mono';font-size:11px;color:var(--red)"></span></div>
+            <div class="atags" id="sv-tags">
+              <button class="atag" onclick="togAct(this,'sv')">Typing</button>
+              <button class="atag" onclick="togAct(this,'sv')">Eating</button>
+              <button class="atag" onclick="togAct(this,'sv')">Drinking</button>
+              <button class="atag" onclick="togAct(this,'sv')">Walking</button>
+              <button class="atag" onclick="togAct(this,'sv')">Resting</button>
+              <button class="atag" onclick="togAct(this,'sv')">Stressed</button>
+              <button class="atag" onclick="togAct(this,'sv')">Exercising</button>
+            </div>
+            <div class="arow"><input class="ainp" id="sv-cus" placeholder="Custom note..."><button class="abtn" onclick="saveAct('sv')">Save</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════ HISTORY ══════ -->
+    <div class="screen hidden" id="sc-history">
+      <div class="ph"><div class="ph-eye">Trends</div><div class="ph-title">Episode <em>History</em></div><div class="ph-sub">Day · week · month · year</div></div>
+      <div class="pad">
+        <div class="g2">
+          <div class="sc sc-teal"><div class="sc-l">Avg/day</div><div class="sc-v" id="h-avg">—</div><div class="sc-u">episodes</div></div>
+          <div class="sc sc-amber"><div class="sc-l">Total logged</div><div class="sc-v" id="h-tot">0</div></div>
+          <div class="sc sc-violet"><div class="sc-l">Longest ever</div><div class="sc-v" id="h-long">—</div><div class="sc-u">seconds</div></div>
+          <div class="sc"><div class="sc-l">Peak hour</div><div class="sc-v" id="h-peak">—</div></div>
+        </div>
+        <div class="card cp mb10">
+          <div class="ttabs">
+            <button class="ttab active" onclick="setTrend('day',this)">Day</button>
+            <button class="ttab" onclick="setTrend('week',this)">Week</button>
+            <button class="ttab" onclick="setTrend('month',this)">Month</button>
+            <button class="ttab" onclick="setTrend('year',this)">Year</button>
+          </div>
+          <canvas id="trendC" height="110"></canvas>
+          <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--ink4);margin-top:4px;font-family:'DM Mono'">
+            <span id="tl-s">—</span><span id="tl-e">—</span>
+          </div>
+        </div>
+        <div class="card cp mb10">
+          <div class="ch">24-hour heatmap <span style="font-size:9px;color:var(--ink4)">darker = more</span></div>
+          <canvas id="heatC" height="50"></canvas>
+          <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--ink4);margin-top:4px;font-family:'DM Mono'"><span>12am</span><span>6am</span><span>12pm</span><span>6pm</span><span>11pm</span></div>
+        </div>
+        <div class="card cp mb10">
+          <div class="ch">This week</div>
+          <div class="wbars" id="weekC"></div>
+          <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--ink4);margin-top:3px"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div>
+        </div>
+        <div class="card cp mb10">
+          <div class="ch"><span>Today's episodes</span><button onclick="clearHist()" style="font-size:10px;color:var(--ink4);cursor:pointer;background:none;border:none;">Clear</button></div>
+          <div class="evlist" id="evList"><div class="empty">No episodes yet.</div></div>
+        </div>
+        <div class="card cp mb10">
+          <div class="ch">Activity during tremors</div>
+          <div id="actBreak"><div class="empty" style="padding:10px">No data yet.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════ REPORT ══════ -->
+    <div class="screen hidden" id="sc-report">
+      <div class="ph"><div class="ph-eye">Analysis</div><div class="ph-title">Clinical <em>Report</em></div><div class="ph-sub">For you and your neurologist</div></div>
+      <div class="pad">
+        <div class="g2">
+          <div class="sc sc-teal"><div class="sc-l">Episodes today</div><div class="sc-v" id="r-cnt">0</div></div>
+          <div class="sc"><div class="sc-l">Tremor time</div><div class="sc-v" id="r-tot">—</div></div>
+          <div class="sc sc-amber"><div class="sc-l">Avg duration</div><div class="sc-v" id="r-avg">—</div><div class="sc-u">s</div></div>
+          <div class="sc"><div class="sc-l">Peak amp.</div><div class="sc-v" id="r-peak">—</div><div class="sc-u">m/s²</div></div>
+        </div>
+        <div class="card cp mb10">
+          <div class="rhead">Today at a glance</div>
+          <div class="rrow"><span>Total episodes</span><span class="rval" id="rr-cnt">0</span></div>
+          <div class="rrow"><span>Total tremor time</span><span class="rval" id="rr-tot">—</span></div>
+          <div class="rrow"><span>Average duration</span><span class="rval" id="rr-avg">—</span></div>
+          <div class="rrow"><span>Longest episode</span><span class="rval" id="rr-max">—</span></div>
+          <div class="rrow"><span>Shortest episode</span><span class="rval" id="rr-min">—</span></div>
+          <div class="rrow"><span>First episode</span><span class="rval" id="rr-first">—</span></div>
+          <div class="rrow"><span>Last episode</span><span class="rval" id="rr-last">—</span></div>
+          <div class="divider"></div>
+          <div class="rhead" style="margin-top:0">Intensity</div>
+          <div style="display:flex;gap:3px;height:8px;border-radius:4px;overflow:hidden;margin-bottom:5px" id="ibar"><div style="flex:1;background:var(--amber2)"></div></div>
+          <div style="display:flex;justify-content:space-between;font-size:10px">
+            <span style="color:var(--amber)">Low <b id="rr-low">—</b></span>
+            <span style="color:var(--red)">Med <b id="rr-med">—</b></span>
+            <span style="color:#991b1b">High <b id="rr-high">—</b></span>
+          </div>
+        </div>
+        <div class="card cp mb10"><div class="rhead">Time of day</div><div id="r-tod"><div class="empty" style="padding:8px">Need 1+ episode.</div></div></div>
+        <div class="card cp mb10"><div class="rhead">Activity correlations</div><div id="r-acts"><div class="empty" style="padding:8px">Log activities to see.</div></div></div>
+        <div class="card cp mb10" id="r-dyn" style="display:none;border-color:var(--red2)">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px"><span style="font-size:15px">🔍</span><div style="font-family:'Fraunces';font-size:14px;color:var(--red)" id="r-dyn-t">Pattern</div></div>
+          <div style="font-size:11px;color:var(--ink2);line-height:1.6" id="r-dyn-b"></div>
+        </div>
+        <div class="card cp mb10"><div class="rhead">Medical insights</div>
+          <div class="icard ic-blue mb10"><div class="itit" style="color:var(--blue)">💊 Medication timing</div><div class="ibody">Tremors 3–5h after last dose suggest wearing-off. Discuss adjusted dosing intervals with your neurologist.</div></div>
+          <div class="icard ic-teal mb10"><div class="itit" style="color:var(--teal)">🏃 Exercise as medicine</div><div class="ibody">150 min/week aerobic exercise linked to slower PD progression. HIIT at 80–85% max HR shows particular promise.</div></div>
+          <div class="icard ic-amber mb10"><div class="itit" style="color:var(--amber)">😴 Sleep &amp; severity</div><div class="ibody">Poor sleep reliably worsens next-day tremor. Log "fatigued" to track this correlation over time.</div></div>
+          <div class="icard ic-violet"><div class="itit" style="color:var(--violet)">🧘 Stress management</div><div class="ibody">Stress activates the sympathetic nervous system, directly amplifying tremor. Mindfulness showed 23% reduction in a pilot RCT.</div></div>
+        </div>
+        <div class="card cp mb10" style="background:var(--ink);border-color:var(--ink)">
+          <div style="font-family:'Fraunces';font-size:15px;color:#fff;margin-bottom:5px">Share with neurologist</div>
+          <p style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:10px;line-height:1.6">Export a plain-text summary of all episodes and activity tags.</p>
+          <button onclick="exportReport()" style="width:100%;padding:10px;background:var(--red);color:#fff;border:none;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans'">📄 Export report</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════ LEARN ══════ -->
+    <div class="screen hidden" id="sc-learn">
+      <div class="ph"><div class="ph-eye">Knowledge</div><div class="ph-title">Learn &amp; <em>Research</em></div><div class="ph-sub">Evidence-based · peer-reviewed · 2024</div></div>
+      <div class="pad">
+        <div class="lhero">
+          <div class="lht">Understanding Parkinson's Tremor</div>
+          <div class="lhs">Clinical knowledge and cutting-edge research to help you navigate your condition.</div>
+        </div>
+        <div class="facts mb14">
+          <div class="fact"><div class="fact-n">10M+</div><div class="fact-d">people worldwide with Parkinson's</div></div>
+          <div class="fact"><div class="fact-n">3–6Hz</div><div class="fact-d">resting tremor frequency</div></div>
+          <div class="fact"><div class="fact-n">70%</div><div class="fact-d">of PD patients have tremor as primary symptom</div></div>
+          <div class="fact"><div class="fact-n">60K</div><div class="fact-d">new PD diagnoses per year in the US</div></div>
+        </div>
+        <div class="lcard">
+          <span class="ltag lt-blue">Neuroscience</span>
+          <h3>What causes Parkinson's tremor?</h3>
+          <p>Tremor originates from disrupted signalling between the basal ganglia and thalamus. Loss of dopaminergic neurons in the substantia nigra creates pathological oscillations at 3–6 Hz — precisely the range TremorCare's bandpass filter targets.</p>
+        </div>
+        <div class="lcard">
+          <span class="ltag lt-red">Classification</span>
+          <h3>Types of tremor in PD</h3>
+          <ul>
+            <li><b>Resting tremor (3–6 Hz)</b> — hallmark of PD; "pill-rolling" disappears during movement</li>
+            <li><b>Postural tremor</b> — when holding position against gravity</li>
+            <li><b>Re-emergent tremor</b> — appears 8–10s after outstretching arms</li>
+            <li><b>Task-specific tremor</b> — triggered by specific activities like writing</li>
+          </ul>
+        </div>
+        <div class="lcard">
+          <span class="ltag lt-teal">Treatment</span>
+          <h3>Evidence-based treatments</h3>
+          <ul>
+            <li><b>Levodopa/carbidopa</b> — first-line; moderate tremor effect</li>
+            <li><b>Deep Brain Stimulation (DBS)</b> — VIM nucleus; highly effective for refractory tremor</li>
+            <li><b>Focused Ultrasound (FUS)</b> — non-invasive thalamotomy for unilateral tremor</li>
+            <li><b>Tai chi, boxing, cycling</b> — evidence for motor and non-motor benefits</li>
+          </ul>
+        </div>
+        <div class="lcard">
+          <span class="ltag lt-amber">Triggers</span>
+          <h3>What worsens tremor severity</h3>
+          <ul>
+            <li><b>Stress &amp; anxiety</b> — most consistently reported trigger</li>
+            <li><b>Fatigue &amp; poor sleep</b> — REM disruption very common in PD</li>
+            <li><b>Medication off-states</b> — most predictable and treatable cause</li>
+            <li><b>Caffeine</b> — variable; may worsen in sensitive individuals</li>
+          </ul>
+        </div>
+        <div class="card cp mb10">
+          <div class="ch" style="margin-bottom:12px">Recent research <span style="font-size:9px;color:var(--ink4)">2022–2024</span></div>
+          <div class="rc"><div class="rc-yr">2024</div><div><h4>Wearable IMU tremor monitoring: clinical validation</h4><p>Multi-centre study validated MPU-6050-based devices vs MDS-UPDRS III. 3–6 Hz RMS correlated strongly (r=0.87) with clinician-rated severity.</p><div class="rc-j">J. Parkinson's Disease · DOI: 10.3233/JPD-240018</div></div></div>
+          <div class="rc"><div class="rc-yr">2023</div><div><h4>ML prediction of levodopa "off" states</h4><p>91% sensitivity predicting off-periods 45 min before onset using RMS amplitude and frequency drift from wearable sensors.</p><div class="rc-j">npj Digital Medicine · DOI: 10.1038/s41746-023-00832-1</div></div></div>
+          <div class="rc"><div class="rc-yr">2023</div><div><h4>HIIT slows motor progression in early PD</h4><p>128 participants: HIIT significantly slowed MDS-UPDRS III progression vs. moderate exercise at 6 months.</p><div class="rc-j">NEJM Evidence · DOI: 10.1056/EVIDoa2300063</div></div></div>
+          <div class="rc"><div class="rc-yr">2022</div><div><h4>FUS thalamotomy vs. DBS: comparative review</h4><p>Meta-analysis (n=1,842): both achieved >70% tremor reduction. FUS: non-invasive. DBS: bilateral, adjustable, reversible.</p><div class="rc-j">The Lancet Neurology · DOI: 10.1016/S1474-4422(22)00162-6</div></div></div>
+        </div>
+        <div class="lcard mb10">
+          <span class="ltag lt-violet">Warning signs</span>
+          <h3>When to contact your neurologist</h3>
+          <p>Seek prompt attention if you notice: significant increase in tremor amplitude over 2–4 weeks; tremor spreading to new areas; sudden worsening; falls; or new cognitive symptoms.</p>
+          <div class="anote"><b>Note:</b> TremorCare is a monitoring aid, not a diagnostic device. Always consult your neurologist for medical decisions.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════ COMMUNITY ══════ -->
+    <div class="screen hidden" id="sc-community">
+      <div class="ph"><div class="ph-eye">Connect</div><div class="ph-title">Community <em>Stories</em></div><div class="ph-sub">Share · ask · support</div></div>
+      <div class="pad">
+        <div class="prof">
+          <div class="prof-t">Your profile</div>
+          <div class="av-row" id="avRow">
+            <div class="av sel" onclick="selAv(this,'🐰')">🐰</div>
+            <div class="av" onclick="selAv(this,'🐶')">🐶</div>
+            <div class="av" onclick="selAv(this,'🐱')">🐱</div>
+            <div class="av" onclick="selAv(this,'🦊')">🦊</div>
+            <div class="av" onclick="selAv(this,'🐻')">🐻</div>
+            <div class="av" onclick="selAv(this,'🐼')">🐼</div>
+            <div class="av" onclick="selAv(this,'🦁')">🦁</div>
+            <div class="av" onclick="selAv(this,'🐸')">🐸</div>
+            <div class="av" onclick="selAv(this,'🐧')">🐧</div>
+            <div class="av" onclick="selAv(this,'🦋')">🦋</div>
+            <div class="av" onclick="selAv(this,'🌸')">🌸</div>
+            <div class="av" onclick="selAv(this,'⭐')">⭐</div>
+          </div>
+          <div class="anon-row">
+            <input class="ninp" id="dispName" type="text" placeholder="Your name (optional)" oninput="updPrev()">
+            <label class="tog-wrap">
+              <input type="checkbox" class="tog-inp" id="anonTog" onchange="updAnon()">
+              <span class="tog-track"></span>
+              Anonymous
+            </label>
+          </div>
+          <div class="prev-box">
+            <div style="font-size:18px" id="prevAv">🐰</div>
+            <div><div style="font-size:11px;font-weight:600;color:var(--ink)" id="prevName">Your name</div><div style="font-size:10px;color:var(--ink4)">Preview of your posts</div></div>
+          </div>
+        </div>
+        <div class="compose">
+          <div class="compose-l">Share with community</div>
+          <textarea class="compose-a" id="postTxt" rows="3" placeholder="Share a tip, tell your story, ask a question..."></textarea>
+          <div class="compose-ft">
+            <div>
+              <div style="font-size:10px;color:var(--ink4);margin-bottom:4px">Tag:</div>
+              <div class="ctags">
+                <span class="ctag" onclick="togCtag(this,'Experience')">📖 Experience</span>
+                <span class="ctag" onclick="togCtag(this,'Tip')">💡 Tip</span>
+                <span class="ctag" onclick="togCtag(this,'Question')">❓ Question</span>
+                <span class="ctag" onclick="togCtag(this,'Support')">🤝 Support</span>
+              </div>
+            </div>
+            <button class="postbtn" onclick="submitPost()">Post →</button>
+          </div>
+        </div>
+        <div class="filt-row">
+          <button class="ctag on" onclick="filtPosts('all',this)">All</button>
+          <button class="ctag" onclick="filtPosts('Experience',this)">Experience</button>
+          <button class="ctag" onclick="filtPosts('Tip',this)">Tips</button>
+          <button class="ctag" onclick="filtPosts('Question',this)">Questions</button>
+          <button class="ctag" onclick="filtPosts('Support',this)">Support</button>
+        </div>
+        <div id="postList"></div>
+      </div>
+    </div>
+
+    <!-- Bottom Nav -->
+    <div class="bottomnav">
+      <button class="ntab active" onclick="goTo('monitor')">
+        <div class="ntab-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></div>
+        <span class="ntab-label">Monitor</span>
+      </button>
+      <button class="ntab" onclick="goTo('history')">
+        <div class="ntab-icon"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+        <span class="ntab-label">History</span>
+      </button>
+      <button class="ntab" onclick="goTo('report')">
+        <div class="ntab-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+        <span class="ntab-label">Report</span>
+      </button>
+      <button class="ntab" onclick="goTo('learn')">
+        <div class="ntab-icon"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+        <span class="ntab-label">Learn</span>
+      </button>
+      <button class="ntab" onclick="goTo('community')">
+        <div class="ntab-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+        <span class="ntab-label">Community</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ CONNECT MODAL (bottom sheet) ══ -->
+  <div class="modal-overlay hidden" id="modal" onclick="handleOverlayClick(event)">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-title">Connect to ESP32</div>
+      <div class="modal-sub">Make sure your ESP32 and this device are on the <b>same WiFi network</b>. Find the IP in Arduino Serial Monitor.</div>
+      <div class="modal-label">WebSocket address</div>
+      <input class="modal-input" id="wsInput" type="url" inputmode="url"
+        placeholder="ws://172.20.10.2:81" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
+      <div class="modal-hint">From Serial Monitor: <code>ws://[IP]:81</code></div>
+      <div class="modal-err" id="modal-err"></div>
+      <button class="modal-connect" id="modal-conn-btn" onclick="doConn()">Connect</button>
+      <button class="modal-cancel" onclick="closeModal()">Cancel</button>
+      <div class="checklist">
+        <div class="checklist-t">Before connecting</div>
+        <ul>
+          <li>ESP32 is powered on and Serial Monitor shows data</li>
+          <li>This device connected to same WiFi as ESP32</li>
+          <li>Address starts with <code>ws://</code></li>
+          <li>Address ends with <code>:81</code></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</div><!-- phone -->
+</div><!-- shell -->
+
+<script>
+// ════════ STATE ════════
+let ws = null, connected = false, demoInt = null;
+const BUF = 100;
+let bX=new Array(BUF).fill(0), bY=new Array(BUF).fill(0),
+    bZ=new Array(BUF).fill(0), bZf=new Array(BUF).fill(0);
+let sc=0;
+// Butterworth 2nd-order BP 3–6Hz @50Hz (JS-side filter for demo mode only)
+const bpB=[0.09921701,0,-0.09921701], bpA=[1,-1.77849011,0.80156599];
+let bx1=0,bx2=0,by1=0,by2=0;
+function bpF(x){let y=bpB[0]*x+bpB[2]*bx2-bpA[1]*by1-bpA[2]*by2;bx2=bx1;bx1=x;by2=by1;by1=y;return y;}
+function rms(a){let s=0;for(let v of a)s+=v*v;return Math.sqrt(s/a.length);}
+const THR=0.03, CONF=800;
+let tremoring=false, tremorStart=null, aboveSince=null;
+let zfW=new Array(25).fill(0), curRMS=0, peakZ=0, curActs=[];
+let episodes = JSON.parse(localStorage.getItem('tc4_ep')||'[]');
+let posts = JSON.parse(localStorage.getItem('tc4_posts')||'[]');
+let myAv='🐰', myAnon=false, selCtags=[], curFilter='all', curTrend='day';
+
+// Seed episodes
+if(!episodes.length){
+  let base=Date.now();
+  let ap=[['Typing'],['Eating'],['Stressed'],['Drinking'],['Resting'],['Walking','Stressed'],['Typing','Stressed'],['Eating']];
+  let ip=['low','medium','medium','high','low','medium','high','low'];
+  [[2.5,38,'medium'],[1.2,52,'high'],[0.5,21,'low']].forEach(([h,dur,int],i)=>{
+    let start=base-h*3600000;
+    episodes.push({id:base+i,start,end:start+dur*1000,duration:dur,peakAmp:+(0.3+Math.random()*0.8).toFixed(3),activities:ap[i],note:'',intensity:int});
+  });
+  for(let d=1;d<=6;d++){let cnt=1+Math.floor(Math.random()*4);for(let i=0;i<cnt;i++){let start=base-d*86400000+i*3600000;let dur=12+Math.floor(Math.random()*75);episodes.push({id:base+d*100+i,start,end:start+dur*1000,duration:dur,peakAmp:+(0.2+Math.random()*0.9).toFixed(3),activities:ap[(d+i)%ap.length],note:'',intensity:ip[(d+i)%ip.length]});}}
+  localStorage.setItem('tc4_ep',JSON.stringify(episodes));
+}
+// Seed posts
+if(!posts.length){posts=[
+  {id:1,av:'🐻',anon:false,name:'Margaret L.',text:"Three months of data and my neurologist finally understood my 'bad days'. She could see the tremor amplitude spike in the afternoons — that's when my meds wear off. We adjusted timing and afternoons are so much better.",tags:['Experience'],time:'2 days ago',likes:18,liked:false},
+  {id:2,av:'🦊',anon:false,name:'David K.',text:"Tip: consistent 'stressed' tagging for 6 weeks showed 65% of high-intensity episodes had that tag. Started 20min daily tai chi — dropped to 40% by week 4. Small change, big difference.",tags:['Tip'],time:'4 days ago',likes:31,liked:false},
+  {id:3,av:'🐰',anon:true,name:'Anonymous',text:"Anyone notice tremors are worse after poor sleep? Under 6 hours and my episodes are almost double the next day. The correlation is striking when you look at the weekly trend chart.",tags:['Question'],time:'6 days ago',likes:22,liked:false},
+  {id:4,av:'🐱',anon:false,name:'Sandra W.',text:"One year of monitoring. Tremors haven't worsened — my neurologist says that's a good outcome, likely partly due to the exercise routine we identified from the activity logs. Keep going everyone.",tags:['Experience','Support'],time:'1 week ago',likes:47,liked:false},
+  {id:5,av:'🐧',anon:true,name:'Anonymous',text:"Newly diagnosed 3 months ago. This app helps me feel less helpless. The Learn section explained what 3–6 Hz means and why my hand shakes more when relaxed than when moving.",tags:['Experience'],time:'2 weeks ago',likes:14,liked:false}
+];localStorage.setItem('tc4_posts',JSON.stringify(posts));}
+
+// ════════ SIGNAL ════════
+function processSample(x,y,z){
+  sc++;
+  // When connected to ESP32: z is already filtered by ESP32's IIR
+  // When in demo mode: apply JS bandpass to simulated z
+  let zf = connected ? z : bpF(z);
+  bX.shift();bX.push(x); bY.shift();bY.push(y);
+  bZ.shift();bZ.push(z); bZf.shift();bZf.push(zf);
+  zfW.shift();zfW.push(zf); curRMS=rms(zfW);
+  if(curRMS>peakZ) peakZ=curRMS;
+  let now=Date.now();
+  if(curRMS>THR){if(!aboveSince)aboveSince=now;if(!tremoring&&now-aboveSince>=CONF)startTremor(aboveSince);}
+  else{aboveSince=null;if(tremoring)endTremor(now);}
+  if(sc%4===0){drawCharts();updateBanners();updateMetrics();}
+}
+function startTremor(t){
+  tremoring=true;tremorStart=t;curActs=[];
+  ['db','sv'].forEach(p=>{document.querySelectorAll('#'+p+'-tags .atag').forEach(b=>b.classList.remove('on'));let c=document.getElementById(p+'-cus');if(c)c.value='';});
+}
+function endTremor(t){
+  tremoring=false;let dur=Math.round((t-tremorStart)/1000);if(dur<1)return;
+  let ep={id:Date.now(),start:tremorStart,end:t,duration:dur,peakAmp:Math.round(peakZ*1000)/1000,activities:[...curActs],note:'',intensity:curRMS>0.8?'high':curRMS>0.4?'medium':'low'};
+  episodes.push(ep);localStorage.setItem('tc4_ep',JSON.stringify(episodes));
+  updateBanners();updateMetrics();updEvList();updWeek();updActBreak();updReport();updTrend();updHeat();genInsight();
+}
+
+// ════════ CHARTS ════════
+function drawLine(id,data,color,range){
+  let c=document.getElementById(id);if(!c||!c.offsetWidth)return;
+  let W=c.offsetWidth,H=c.height;c.width=W;let ctx=c.getContext('2d');ctx.clearRect(0,0,W,H);
+  ctx.strokeStyle='rgba(0,0,0,0.04)';ctx.lineWidth=0.5;ctx.beginPath();ctx.moveTo(0,H/2);ctx.lineTo(W,H/2);ctx.stroke();
+  ctx.strokeStyle=color;ctx.lineWidth=1.5;ctx.lineJoin='round';ctx.beginPath();
+  for(let i=0;i<data.length;i++){let px=i/(data.length-1)*W,n=Math.max(0.02,Math.min(0.98,data[i]/range*0.44+0.5)),py=(1-n)*H;i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);}ctx.stroke();
+}
+function drawZf(){
+  let c=document.getElementById('cZf');if(!c||!c.offsetWidth)return;
+  let W=c.offsetWidth,H=c.height;c.width=W;let ctx=c.getContext('2d');ctx.clearRect(0,0,W,H);
+  if(tremoring){ctx.fillStyle='rgba(196,98,45,0.05)';ctx.fillRect(0,0,W,H);}
+  let ty=H/2-THR/2*H*0.85,by=H/2+THR/2*H*0.85;
+  ctx.strokeStyle='rgba(196,98,45,0.2)';ctx.lineWidth=1;ctx.setLineDash([3,2]);
+  ctx.beginPath();ctx.moveTo(0,ty);ctx.lineTo(W,ty);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(0,by);ctx.lineTo(W,by);ctx.stroke();ctx.setLineDash([]);
+  ctx.strokeStyle='rgba(0,0,0,0.04)';ctx.lineWidth=0.5;ctx.beginPath();ctx.moveTo(0,H/2);ctx.lineTo(W,H/2);ctx.stroke();
+  ctx.strokeStyle='#c4622d';ctx.lineWidth=1.5;ctx.lineJoin='round';ctx.beginPath();
+  for(let i=0;i<bZf.length;i++){let px=i/(bZf.length-1)*W,n=Math.max(0.02,Math.min(0.98,bZf[i]/2*0.85+0.5)),py=(1-n)*H;i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);}ctx.stroke();
+}
+function drawCharts(){
+  drawLine('cX',bX,'#1d4ed8',20);drawLine('cY',bY,'#0d7a6e',20);drawLine('cZ',bZ,'#a1a1aa',20);drawZf();
+  let ff=document.getElementById('ffill');if(ff)ff.style.width=Math.min(100,curRMS/1.5*100).toFixed(1)+'%';
+  let rd=document.getElementById('rmsdisp');if(rd)rd.textContent=curRMS.toFixed(3);
+}
+function updTrend(){
+  let c=document.getElementById('trendC');if(!c||!c.offsetWidth)return;
+  let W=c.offsetWidth,H=c.height;c.width=W;let ctx=c.getContext('2d');ctx.clearRect(0,0,W,H);
+  let labels=[],values=[],now=new Date(),p=curTrend;
+  if(p==='day'){for(let h=0;h<24;h++){labels.push(h+'h');values.push(episodes.filter(e=>{let d=new Date(e.start);return d.toDateString()===now.toDateString()&&d.getHours()===h;}).length);}document.getElementById('tl-s').textContent='12am';document.getElementById('tl-e').textContent='11pm';}
+  else if(p==='week'){for(let d=6;d>=0;d--){let dt=new Date(now-d*86400000);labels.push(['S','M','T','W','T','F','S'][dt.getDay()]);dt.setHours(0,0,0,0);values.push(episodes.filter(e=>{let ed=new Date(e.start);ed.setHours(0,0,0,0);return ed.getTime()===dt.getTime();}).length);}document.getElementById('tl-s').textContent='7d ago';document.getElementById('tl-e').textContent='Today';}
+  else if(p==='month'){for(let d=29;d>=0;d--){let dt=new Date(now-d*86400000);dt.setHours(0,0,0,0);values.push(episodes.filter(e=>{let ed=new Date(e.start);ed.setHours(0,0,0,0);return ed.getTime()===dt.getTime();}).length);labels.push(d===0?'T':'');}document.getElementById('tl-s').textContent='30d ago';document.getElementById('tl-e').textContent='Today';}
+  else{for(let m=11;m>=0;m--){let dt=new Date(now.getFullYear(),now.getMonth()-m,1);labels.push(['J','F','M','A','M','J','J','A','S','O','N','D'][dt.getMonth()]);values.push(episodes.filter(e=>{let ed=new Date(e.start);return ed.getMonth()===dt.getMonth()&&ed.getFullYear()===dt.getFullYear();}).length);}document.getElementById('tl-s').textContent='12mo ago';document.getElementById('tl-e').textContent='Now';}
+  let maxV=Math.max(...values,1),pad=22,cW=W-pad,pts=values.length;
+  for(let i=0;i<=3;i++){let y=H-16-(i/3)*(H-22);ctx.strokeStyle='rgba(0,0,0,0.05)';ctx.lineWidth=0.5;ctx.beginPath();ctx.moveTo(pad,y);ctx.lineTo(W,y);ctx.stroke();}
+  ctx.fillStyle='#a1a1aa';ctx.font='8px DM Mono,monospace';ctx.textAlign='right';
+  for(let i=0;i<=3;i++){let y=H-16-(i/3)*(H-22);ctx.fillText(Math.round(i/3*maxV),pad-3,y+3);}
+  let grd=ctx.createLinearGradient(0,0,0,H-16);grd.addColorStop(0,'rgba(196,98,45,0.15)');grd.addColorStop(1,'rgba(196,98,45,0)');
+  ctx.beginPath();ctx.moveTo(pad,H-16);
+  for(let i=0;i<pts;i++){let x=pad+i/(pts-1)*cW,y=H-16-(values[i]/maxV)*(H-22);ctx.lineTo(x,y);}
+  ctx.lineTo(W,H-16);ctx.closePath();ctx.fillStyle=grd;ctx.fill();
+  ctx.strokeStyle='#c4622d';ctx.lineWidth=2;ctx.lineJoin='round';ctx.beginPath();
+  for(let i=0;i<pts;i++){let x=pad+i/(pts-1)*cW,y=H-16-(values[i]/maxV)*(H-22);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}ctx.stroke();
+  values.forEach((v,i)=>{if(v>0){let x=pad+i/(pts-1)*cW,y=H-16-(v/maxV)*(H-22);ctx.beginPath();ctx.arc(x,y,3,0,Math.PI*2);ctx.fillStyle='#c4622d';ctx.fill();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(x,y,1.2,0,Math.PI*2);ctx.fill();}});
+  ctx.fillStyle='#a1a1aa';ctx.font='8px DM Sans,sans-serif';ctx.textAlign='center';
+  let step=Math.max(1,Math.floor(pts/7));
+  for(let i=0;i<pts;i+=step){ctx.fillText(labels[i],pad+i/(pts-1)*cW,H-2);}
+  // summary stats
+  let tot=values.reduce((a,b)=>a+b,0);
+  let ha=document.getElementById('h-avg');if(ha)ha.textContent=(tot/Math.max(values.filter(v=>v>=0).length,1)).toFixed(1);
+  let ht=document.getElementById('h-tot');if(ht)ht.textContent=episodes.length;
+  let hl=document.getElementById('h-long');if(hl)hl.textContent=episodes.length?Math.max(...episodes.map(e=>e.duration)):'—';
+  let hC=new Array(24).fill(0);episodes.forEach(e=>hC[new Date(e.start).getHours()]++);
+  let peakH=hC.indexOf(Math.max(...hC));
+  let hp=document.getElementById('h-peak');if(hp)hp.textContent=episodes.length?(peakH>=12?(peakH===12?'12pm':(peakH-12)+'pm'):(peakH===0?'12am':peakH+'am')):'—';
+}
+function updHeat(){
+  let c=document.getElementById('heatC');if(!c||!c.offsetWidth)return;
+  let W=c.offsetWidth,H=c.height;c.width=W;let ctx=c.getContext('2d');ctx.clearRect(0,0,W,H);
+  let hC=new Array(24).fill(0);episodes.forEach(e=>hC[new Date(e.start).getHours()]++);
+  let maxC=Math.max(...hC,1),cw=W/24;
+  for(let h=0;h<24;h++){
+    let it=hC[h]/maxC;
+    let r=Math.round(196*it+240*(1-it)),g=Math.round(98*it+235*(1-it)),b=Math.round(45*it+220*(1-it));
+    ctx.fillStyle=it>0?`rgb(${r},${g},${b})`:'rgba(0,0,0,0.04)';
+    let x=h*cw,rr=3,bh=H-4;
+    ctx.beginPath();ctx.moveTo(x+1+rr,2);ctx.lineTo(x+cw-1-rr,2);ctx.quadraticCurveTo(x+cw-1,2,x+cw-1,2+rr);ctx.lineTo(x+cw-1,bh);ctx.lineTo(x+1,bh);ctx.lineTo(x+1,2+rr);ctx.quadraticCurveTo(x+1,2,x+1+rr,2);ctx.closePath();ctx.fill();
+    if(hC[h]>0){ctx.fillStyle=it>0.5?'rgba(255,255,255,0.9)':'rgba(0,0,0,0.45)';ctx.font='bold 9px DM Mono,monospace';ctx.textAlign='center';ctx.fillText(hC[h],x+cw/2,H/2+4);}
+  }
+}
+
+// ════════ UI ════════
+function updateBanners(){
+  let rs=curRMS.toFixed(3);
+  [['db'],['sv']].forEach(([p])=>{
+    let bn=document.getElementById(p+'-ban'),bs=document.getElementById(p+'-st'),bd=document.getElementById(p+'-dt'),br=document.getElementById(p+'-rms');
+    if(!bn)return;
+    if(tremoring){bn.className='sbanner bt';bs.textContent='Tremor';let el=Math.round((Date.now()-tremorStart)/1000);bd.textContent='Duration: '+el+'s · RMS: '+rs;let t=document.getElementById(p+'-logtim');if(t){let m=String(Math.floor(el/60)).padStart(2,'0'),s=String(el%60).padStart(2,'0');t.textContent=m+':'+s;}}
+    else{bn.className='sbanner bn';bs.textContent='Normal';bd.textContent='No tremor detected';let t=document.getElementById(p+'-logtim');if(t)t.textContent='';}
+    if(br)br.textContent=rs;
+  });
+}
+function todayEps(){let m=new Date();m.setHours(0,0,0,0);return episodes.filter(e=>e.start>=m.getTime());}
+function updateMetrics(){
+  let eps=todayEps();
+  ['db','sv'].forEach(p=>{let el=document.getElementById(p+'-cnt');if(el)el.textContent=eps.length;});
+  if(!eps.length)return;
+  let durs=eps.map(e=>e.duration);
+  let ag=document.getElementById('db-avg');if(ag)ag.textContent=Math.round(durs.reduce((a,b)=>a+b)/durs.length);
+  let pk=document.getElementById('sv-peak');if(pk)pk.textContent=Math.max(...eps.map(e=>e.peakAmp||0)).toFixed(3);
+  let lt=document.getElementById('db-last'),la=document.getElementById('db-ago');
+  if(lt&&la){let last=eps[eps.length-1];let d=new Date(last.start);lt.textContent=d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});let mAgo=Math.round((Date.now()-last.end)/60000);la.textContent=mAgo<1?'Just now':mAgo<60?mAgo+'m ago':Math.round(mAgo/60)+'h ago';}
+  let nt=document.getElementById('db-norm');if(nt){let ds=new Date();ds.setHours(0,0,0,0);let el=Math.round((Date.now()-ds)/1000);let tt=eps.reduce((a,e)=>a+e.duration,0);let norm=Math.max(0,el-tt);let h=Math.floor(norm/3600),mn=Math.floor(norm%3600/60);nt.textContent=(h>0?h+'h ':'')+mn+'m';}
+}
+function updEvList(){
+  let list=document.getElementById('evList');if(!list)return;
+  let eps=todayEps().slice().reverse();
+  if(!eps.length){list.innerHTML='<div class="empty">No episodes today.</div>';return;}
+  list.innerHTML=eps.map(ep=>{let t=new Date(ep.start).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});let ic={low:'ilow',medium:'imed',high:'ihigh'}[ep.intensity||'low'];let il={low:'Low',medium:'Med',high:'High'}[ep.intensity||'low'];let acts=ep.activities.map(a=>`<span class="apill">${a}</span>`).join('');return`<div class="evitem"><div class="evpip"></div><div class="evbody"><div class="evtit">Tremor <span class="ibadge ${ic}">${il}</span></div><div class="evmeta">${ep.duration}s · ${ep.peakAmp}g</div><div>${acts}</div></div><div class="evtime">${t}</div></div>`;}).join('');
+}
+function updWeek(){
+  let wrap=document.getElementById('weekC');if(!wrap)return;
+  let dow=new Date().getDay(),adj=dow===0?6:dow-1,counts=new Array(7).fill(0);
+  let today=new Date();today.setHours(0,0,0,0);
+  episodes.forEach(ep=>{let d=new Date(ep.start);d.setHours(0,0,0,0);let diff=Math.round((today-d)/86400000);let idx=adj-diff;if(idx>=0&&idx<7)counts[idx]++;});
+  let maxC=Math.max(...counts,1);
+  wrap.innerHTML=['M','T','W','T','F','S','S'].map((d,i)=>{let h=Math.round(counts[i]/maxC*55);let isT=i===adj;return`<div class="wbcol"><div class="wbcnt">${counts[i]||''}</div><div class="wbspc"><div class="wbbar${isT?' today':''}" style="height:${h}px"></div></div><div class="wbday" style="${isT?'color:var(--red);font-weight:600':''}">${d}</div></div>`;}).join('');
+}
+function updActBreak(){
+  let map={};episodes.forEach(ep=>ep.activities.forEach(a=>{map[a]=(map[a]||0)+1;}));
+  let total=Object.values(map).reduce((a,b)=>a+b,0)||1;
+  let sorted=Object.entries(map).sort((a,b)=>b[1]-a[1]);
+  let html=sorted.length?sorted.map(([a,c])=>{let p=Math.round(c/total*100);return`<div class="prow"><span class="plab">${a}</span><div class="ptrack"><div class="pfill" style="width:${p}%"></div></div><span class="ppct">${p}%</span></div>`;}).join(''):'<div class="empty" style="padding:8px">No activities logged.</div>';
+  let ab=document.getElementById('actBreak');if(ab)ab.innerHTML=html;
+  let ra=document.getElementById('r-acts');if(ra)ra.innerHTML=html||'<div class="empty" style="padding:8px">Log activities to see.</div>';
+}
+function updReport(){
+  let eps=todayEps();
+  let se=(id,v)=>{let el=document.getElementById(id);if(el)el.textContent=v;};
+  ['r-cnt','rr-cnt'].forEach(id=>se(id,eps.length));
+  if(!eps.length)return;
+  let durs=eps.map(e=>e.duration),total=durs.reduce((a,b)=>a+b,0),avg=Math.round(total/durs.length);
+  se('r-tot',total+'s');se('rr-tot',total+'s ('+((total/60).toFixed(1))+' min)');
+  se('r-avg',avg+'s');se('rr-avg',avg+'s');
+  se('r-peak',Math.max(...eps.map(e=>e.peakAmp||0)).toFixed(3));
+  se('rr-max',Math.max(...durs)+'s');se('rr-min',Math.min(...durs)+'s');
+  se('rr-first',new Date(Math.min(...eps.map(e=>e.start))).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}));
+  se('rr-last',new Date(Math.max(...eps.map(e=>e.start))).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}));
+  let low=eps.filter(e=>e.intensity==='low').length,med=eps.filter(e=>e.intensity==='medium').length,high=eps.filter(e=>e.intensity==='high').length;
+  let fmt=n=>n+'('+Math.round(n/eps.length*100)+'%)';
+  se('rr-low',fmt(low));se('rr-med',fmt(med));se('rr-high',fmt(high));
+  let ib=document.getElementById('ibar');if(ib)ib.innerHTML=`<div style="flex:${low||0.1};background:var(--amber2)"></div><div style="flex:${med||0.1};background:var(--red2)"></div><div style="flex:${high||0.1};background:#fde8e8"></div>`;
+  let tm={Morning:0,Afternoon:0,Evening:0,Night:0};
+  episodes.forEach(ep=>{let h=new Date(ep.start).getHours();if(h>=6&&h<12)tm.Morning++;else if(h>=12&&h<18)tm.Afternoon++;else if(h>=18&&h<22)tm.Evening++;else tm.Night++;});
+  let tt=episodes.length||1,rt=document.getElementById('r-tod');
+  if(rt&&episodes.length)rt.innerHTML=Object.entries(tm).map(([k,v])=>{let p=Math.round(v/tt*100);return`<div class="prow"><span class="plab">${k}</span><div class="ptrack"><div class="pfill" style="width:${p}%;background:var(--teal)"></div></div><span class="ppct">${p}%</span></div>`;}).join('');
+  updActBreak();genInsight();
+}
+function genInsight(){
+  let card=document.getElementById('r-dyn');if(!card)return;
+  let eps=todayEps();if(eps.length<2){card.style.display='none';return;}
+  card.style.display='block';
+  let stress=eps.filter(e=>e.activities.includes('Stressed'));
+  let avgDur=Math.round(eps.map(e=>e.duration).reduce((a,b)=>a+b)/eps.length);
+  let t=document.getElementById('r-dyn-t'),b=document.getElementById('r-dyn-b');
+  if(stress.length/eps.length>0.5){t.textContent='⚠️ Stress correlation';b.textContent=`${Math.round(stress.length/eps.length*100)}% of today's episodes tagged "Stressed." Discuss stress-reduction strategies with your care team.`;}
+  else{t.textContent='📈 Today\'s pattern';b.textContent=`${eps.length} episode${eps.length>1?'s':''} today, avg ${avgDur}s. Keep logging activities to reveal personal trigger patterns.`;}
+}
+function exportReport(){
+  let eps=todayEps();
+  let txt=`TremorCare Report — ${new Date().toLocaleDateString()}\n\nEpisodes: ${eps.length}\nAvg: ${eps.length?Math.round(eps.map(e=>e.duration).reduce((a,b)=>a+b)/eps.length):0}s\nTotal: ${eps.reduce((a,e)=>a+e.duration,0)}s\n\n${eps.map(e=>`${new Date(e.start).toLocaleTimeString()} — ${e.duration}s [${e.intensity}] ${e.activities.join(', ')}`).join('\n')}\n\nGenerated by TremorCare`;
+  let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type:'text/plain'}));a.download=`TremorCare-${new Date().toISOString().slice(0,10)}.txt`;a.click();
+}
+function clearHist(){if(confirm('Clear all history?')){episodes=[];localStorage.removeItem('tc4_ep');updEvList();updWeek();updateMetrics();updActBreak();updTrend();updHeat();}}
+function togAct(btn,p){
+  btn.classList.toggle('on');
+  let other=p==='db'?'sv':'db';
+  let ob=Array.from(document.querySelectorAll('#'+other+'-tags .atag')).find(b=>b.textContent===btn.textContent);
+  if(ob)ob.classList.toggle('on',btn.classList.contains('on'));
+  curActs=Array.from(document.querySelectorAll('#db-tags .atag.on')).map(b=>b.textContent);
+}
+function saveAct(p){
+  curActs=Array.from(document.querySelectorAll('#'+p+'-tags .atag.on')).map(b=>b.textContent);
+  let note=document.getElementById(p+'-cus').value.trim();
+  if(!curActs.length&&!note)return;
+  if(episodes.length){let last=episodes[episodes.length-1];last.activities=curActs;last.note=note;localStorage.setItem('tc4_ep',JSON.stringify(episodes));updEvList();updActBreak();['db','sv'].forEach(q=>{document.querySelectorAll('#'+q+'-tags .atag').forEach(b=>b.classList.remove('on'));let c=document.getElementById(q+'-cus');if(c)c.value='';});}
+}
+
+// ════════ WEBSOCKET (exact same pattern as v3 that works) ════════
+function openModal(){
+  let saved=localStorage.getItem('tc4_ws_url');
+  if(saved)document.getElementById('wsInput').value=saved;
+  document.getElementById('modal-err').style.display='none';
+  document.getElementById('modal-conn-btn').textContent='Connect';
+  document.getElementById('modal').classList.remove('hidden');
+}
+function closeModal(){document.getElementById('modal').classList.add('hidden');}
+function handleOverlayClick(e){if(e.target===document.getElementById('modal'))closeModal();}
+
+function doConn(){
+  let url=document.getElementById('wsInput').value.trim();
+  let errEl=document.getElementById('modal-err');
+  errEl.style.display='none';
+
+  if(!url){errEl.style.display='block';errEl.textContent='Please enter the WebSocket address.';return;}
+  if(!url.startsWith('ws://') && !url.startsWith('wss://')){
+    url='ws://'+url;
+    document.getElementById('wsInput').value=url;
+  }
+  if(!url.match(/:\d+/)){url=url+':81';document.getElementById('wsInput').value=url;}
+
+  localStorage.setItem('tc4_ws_url',url);
+  document.getElementById('modal-conn-btn').textContent='Connecting...';
+
+  try{
+    ws=new WebSocket(url);
+    ws.onopen=()=>{
+      connected=true;
+      stopDemo();
+      document.getElementById('cdot').classList.add('live');
+      document.getElementById('ctext').textContent='ESP32 connected';
+      document.getElementById('connBtn').textContent='Disconnect';
+      document.getElementById('connBtn').classList.add('connected');
+      document.getElementById('demobar').classList.add('hidden');
+      document.getElementById('modal').classList.add('hidden');
+    };
+    ws.onmessage=e=>{
+      try{let d=JSON.parse(e.data);if(d.x!==undefined)processSample(+d.x,+d.y,+d.z);}catch(err){}
+    };
+    ws.onclose=ws.onerror=()=>{
+      if(connected){
+        // was connected, now dropped
+        connected=false;
+        ws=null;
+        document.getElementById('cdot').classList.remove('live');
+        document.getElementById('ctext').textContent='Disconnected';
+        document.getElementById('connBtn').textContent='⚡ Connect ESP32';
+        document.getElementById('connBtn').classList.remove('connected');
+        document.getElementById('demobar').classList.remove('hidden');
+        startDemo();
+      } else {
+        // never connected - show error in modal
+        ws=null;
+        document.getElementById('modal-conn-btn').textContent='Connect';
+        errEl.style.display='block';
+        errEl.innerHTML='❌ Could not connect to <b>'+url+'</b><br><br>Check:<br>• Both devices on same WiFi network<br>• ESP32 is powered on and running<br>• Serial Monitor shows IP address<br>• Address format: <code>ws://x.x.x.x:81</code>';
+      }
+    };
+  }catch(e){
+    errEl.style.display='block';
+    errEl.textContent='Invalid address: '+e.message;
+    document.getElementById('modal-conn-btn').textContent='Connect';
+  }
+}
+
+function doDisconn(){
+  connected=false;
+  if(ws){ws.close();ws=null;}
+  document.getElementById('cdot').classList.remove('live');
+  document.getElementById('ctext').textContent='Demo mode';
+  document.getElementById('connBtn').textContent='⚡ Connect ESP32';
+  document.getElementById('connBtn').classList.remove('connected');
+  document.getElementById('demobar').classList.remove('hidden');
+  startDemo();
+}
+
+// Make conn button toggle
+document.getElementById('connBtn').addEventListener('click',function(){
+  if(connected)doDisconn();else openModal();
+});
+// Remove onclick from HTML (set in JS above)
+document.getElementById('connBtn').removeAttribute('onclick');
+
+// ════════ NAVIGATION ════════
+function goTo(name){
+  document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.classList.add('hidden');});
+  let t=document.getElementById('sc-'+name);t.classList.remove('hidden');t.classList.add('active');
+  document.querySelectorAll('.ntab').forEach((b,i)=>b.classList.toggle('active',['monitor','history','report','learn','community'][i]===name));
+  if(name==='history'){updEvList();updWeek();updActBreak();updTrend();updHeat();}
+  if(name==='report')updReport();
+  if(name==='community')renderPosts();
+}
+function setView(v){
+  document.getElementById('vd').classList.toggle('hidden',v!=='d');
+  document.getElementById('vs').classList.toggle('hidden',v!=='s');
+  document.getElementById('vt-d').classList.toggle('active',v==='d');
+  document.getElementById('vt-s').classList.toggle('active',v==='s');
+}
+function setTrend(p,btn){curTrend=p;document.querySelectorAll('.ttab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');updTrend();}
+
+// ════════ COMMUNITY ════════
+function selAv(el,av){myAv=av;document.querySelectorAll('.av').forEach(a=>a.classList.remove('sel'));el.classList.add('sel');updPrev();}
+function updAnon(){myAnon=document.getElementById('anonTog').checked;updPrev();}
+function updPrev(){let nm=document.getElementById('dispName')?.value.trim()||'';let pa=document.getElementById('prevAv'),pn=document.getElementById('prevName');if(pa)pa.textContent=myAnon?'👤':myAv;if(pn)pn.textContent=myAnon?'Anonymous':(nm||'Community member');}
+function togCtag(el,tag){el.classList.toggle('on');selCtags=selCtags.includes(tag)?selCtags.filter(t=>t!==tag):[...selCtags,tag];}
+const tagCls={Experience:'pt-e',Tip:'pt-t',Question:'pt-q',Support:'pt-s'};
+function filtPosts(f,btn){curFilter=f;document.querySelectorAll('.filt-row .ctag').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderPosts();}
+function submitPost(){
+  let txt=document.getElementById('postTxt').value.trim();if(!txt)return;
+  let nm=document.getElementById('dispName')?.value.trim()||'';
+  let name=myAnon?'Anonymous':(nm||'Community member');
+  posts.unshift({id:Date.now(),av:myAv,anon:myAnon,name,text:txt,tags:selCtags.length?[...selCtags]:['Experience'],time:'Just now',likes:0,liked:false});
+  localStorage.setItem('tc4_posts',JSON.stringify(posts));
+  document.getElementById('postTxt').value='';selCtags=[];document.querySelectorAll('.ctag').forEach(t=>t.classList.remove('on'));renderPosts();
+}
+function togLike(id){let p=posts.find(p=>p.id===id);if(!p)return;p.liked=!p.liked;p.likes+=(p.liked?1:-1);localStorage.setItem('tc4_posts',JSON.stringify(posts));renderPosts();}
+function renderPosts(){
+  let list=document.getElementById('postList');if(!list)return;
+  let filtered=curFilter==='all'?posts:posts.filter(p=>p.tags.includes(curFilter));
+  if(!filtered.length){list.innerHTML='<div class="empty">No posts in this category yet.</div>';return;}
+  list.innerHTML=filtered.map(p=>{let tags=p.tags.map(t=>`<span class="ptag ${tagCls[t]||'pt-e'}">${t}</span>`).join('');return`<div class="pcard"><div class="pcard-hd"><div class="pav2">${p.anon?'👤':p.av}</div><div><div class="pname">${p.name}</div><div style="display:flex;align-items:center;gap:5px"><span class="ptime">${p.time}</span><div class="ptags">${tags}</div></div></div></div><div class="pbody">${p.text}</div><div class="pfooter"><div class="pact${p.liked?' liked':''}" onclick="togLike(${p.id})">♥ ${p.likes}</div><div class="pact">↩ Reply</div><div class="pact">⤴ Share</div></div></div>`;}).join('');
+}
+
+// ════════ DEMO ════════
+let dT=0,dTrem=false,dTicks=0;
+function startDemo(){
+  if(demoInt||connected)return;
+  demoInt=setInterval(()=>{
+    dT+=0.02;
+    let x=Math.sin(dT*1.3)*2.5+(Math.random()-.5)*.3;
+    let y=Math.cos(dT*.9)*1.8+(Math.random()-.5)*.3;
+    let z;
+    if(dTrem){z=Math.sin(dT*2*Math.PI*4.5)*1.2+(Math.random()-.5)*.2;dTicks++;if(dTicks>150+Math.random()*100){dTrem=false;dTicks=0;}}
+    else{z=(Math.random()-.5)*.15;if(Math.random()<0.0008)dTrem=true;}
+    processSample(x,y,z);
+  },20);
+}
+function stopDemo(){if(demoInt){clearInterval(demoInt);demoInt=null;}}
+function triggerDemo(){dTrem=true;dTicks=0;}
+
+// ════════ INIT ════════
+setView('s');
+updateMetrics();updEvList();updWeek();updActBreak();renderPosts();startDemo();
+setInterval(()=>{if(tremoring){updateBanners();updateMetrics();}},1000);
+// Live clock
+function updClock(){let n=new Date();document.getElementById('clock').textContent=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');}
+updClock();setInterval(updClock,10000);
+window.addEventListener('resize',()=>{updTrend();updHeat();});
+</script>
+</body>
+</html>
